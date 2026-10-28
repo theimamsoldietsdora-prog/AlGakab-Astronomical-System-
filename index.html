@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>نظام المهندس آل عكاب الفلكي - المحرك المطور</title>
+    <title>نظام المهندس آل عكاب الفلكي - التقويم القمري المتسلسل</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/moon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #07090e; color: #e6edf3; font-family: system-ui, -apple-system, sans-serif; }
-        .card { background: rgba(13, 17, 23, 0.9); border: 1px string #30363d; backdrop-filter: blur(14px); border: 1px solid rgba(48, 54, 61, 0.6); }
+        .card { background: rgba(13, 17, 23, 0.9); border: 1px solid rgba(48, 54, 61, 0.6); backdrop-filter: blur(14px); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
         .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border-radius: 5px; background: rgba(22, 27, 34, 0.8); }
         .day-header { font-size: 0.65rem; font-weight: bold; color: #8b949e; padding-bottom: 3px; }
@@ -20,14 +20,14 @@
 
     <header class="text-center my-4">
         <h1 class="text-xl font-bold text-amber-400">نظام المهندس آل عكاب الفلكي</h1>
-        <p class="text-xs text-gray-400 mt-1">النموذج الرياضي المستمر لحركة العمود الحلزوني والمستشعرات الجوية</p>
+        <p class="text-xs text-gray-400 mt-1">التقويم القمري المتسلسل المبني على حركة عمود السبرنك والكسور الدقيقة</p>
     </header>
 
-    <!-- لوحة المستشعرات الجوية والمناخية المتقدمة -->
+    <!-- لوحة المستشعرات الجوية والمناخية -->
     <div class="card p-4 rounded-2xl mb-5 shadow-2xl border-cyan-500/30">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
             <span class="text-xs font-bold text-cyan-400">📡 شبكة المستشعرات الجوية الفلكية</span>
-            <span id="sensor-mode" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">حساب حقيقي دقيق</span>
+            <span id="sensor-mode" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">مصحح بالكسور</span>
         </div>
         <div class="grid grid-cols-2 gap-2.5 text-xs">
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
@@ -43,66 +43,72 @@
                 <span id="sensor-wind" class="font-bold text-emerald-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">الرطوبة النسبية والتكثف:</span>
+                <span class="text-gray-400 block text-[10px]">الرطوبة ونسبة التكثف:</span>
                 <span id="sensor-humidity" class="font-bold text-indigo-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 col-span-2">
-                <span class="text-gray-400 block text-[10px]">حالة الغلاف والحرارة الحقيقية:</span>
+                <span class="text-gray-400 block text-[10px]">المناخ والطقس الحقيقي:</span>
                 <span id="sensor-climate" class="font-bold text-rose-300 text-xs">-</span>
             </div>
         </div>
     </div>
 
-    <!-- حاوية التقويم الشبكي للأشهر الـ 12 بدقة الساعات والدقائق -->
-    <div id="calendar-container" class="space-y-4">
-        <!-- يتم توليد الأشهر هنا -->
-    </div>
+    <!-- حاوية التقويم الشبكي للأشهر الـ 12 المتسلسلة -->
+    <div id="calendar-container" class="space-y-4"></div>
 
     <script>
-        // المعادلة الرياضية التموية المتصلة الدقيقة لأطوال الأشهر (تزايد وتناقص تدريجي حقيقي)
-        // ذروة الأوج (الشهر 1) والحضيض (الشهر 6) مع دقة الكسور الزمنية (24 ساعة فلكية)
-        function getMonthDuration(m) {
-            // دالة جيبية هارمونية تعطي تدرجاً حقيقياً متصلاً ودقيقاً
-            const base = 29.35;
-            const amplitude = 0.42; // لضمان التدرج الحقيقي الدقيق بين الأيام (29 و 30 يوماً)
-            let duration = base + amplitude * Math.cos(((m - 1) * 2 * Math.PI) / 12);
-            return duration; // باليوم مع الكسور الدقيقة
-        }
-
+        // الأسماء القمرية الاثني عشر بالتسلسل الدقيق
         const monthNames = [
-            "1. شهر الأوج (ذروة الشتاء - 21/12)",
-            "2. شهر النزول الأول",
-            "3. شهر النزول الثاني",
-            "4. شهر الاعتدال الهابط",
-            "5. شهر الاقتراب الصيفي",
-            "6. شهر الحضيض (ذروة الصيف - 21/6)",
-            "7. شهر الصعود الأول",
-            "8. شهر الصعود الثاني",
-            "9. شهر رمضان (الاعتدال الصاعد)",
-            "10. شهر العيد والصعود الثالث",
-            "11. شهر الاقتراب من الأوج",
-            "12. شهر ذروة الثبات"
+            "1. شهر رمضان المبارك",
+            "2. شهر شوال",
+            "3. شهر ذو القعدة",
+            "4. شهر ذو الحجة",
+            "5. شهر محرم الحرام",
+            "6. شهر صفر",
+            "7. شهر ربيع الأول",
+            "8. شهر ربيع الثاني",
+            "9. شهر جمادى الأولى",
+            "10. شهر جمادى الآخرة",
+            "11. شهر رجب المرجب",
+            "12. شهر شعبان المعظم"
         ];
+
+        // خوارزمية أطوال الأشهر مع ترحيل الكسور الدقيق
+        function getMonthData(m) {
+            let exactFraction = 0.25;
+            if (m === 1) { exactFraction = 0.4625; } 
+            else if (m === 2) { exactFraction = 0.375; }
+            else if (m === 4) { exactFraction = 0.125; }
+            else if (m === 6) { exactFraction = 0.0875; } 
+            else if (m >= 10) { exactFraction = 0.40; }
+
+            let totalExactDays = 29 + exactFraction;
+            let integerDays = totalExactDays >= 29.35 ? 30 : 29;
+
+            return {
+                exact: totalExactDays.toFixed(4),
+                days: integerDays
+            };
+        }
 
         const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
 
         function calculateExactEntries() {
             let entries = [];
-            let cumulativeHours = 0; // بالساعات الفلكية التراكمية
+            let cumulativeHours = 0;
 
             for (let i = 1; i <= 12; i++) {
-                let durationDays = getMonthDuration(i);
-                let durationHours = durationDays * 24;
+                let mData = getMonthData(i);
+                let durationHours = parseFloat(mData.exact) * 24;
 
-                let entryDayInYear = Math.floor(cumulativeHours / 24) + 1;
                 let dayOfMonthIndex = (Math.floor(cumulativeHours / 24) % 30) + 1;
                 let hourOfDay = Math.floor(cumulativeHours % 24);
                 let minuteOfHour = Math.floor(((cumulativeHours % 24) % 1) * 60);
 
                 entries.push({
                     month: i,
-                    exactDuration: durationDays.toFixed(4),
-                    integerDays: Math.round(durationDays),
+                    exactDuration: mData.exact,
+                    integerDays: mData.days,
                     entryString: `اليوم ${dayOfMonthIndex} | الساعة ${hourOfDay.toString().padStart(2,'0')}:${minuteOfHour.toString().padStart(2,'0')}`
                 });
 
@@ -117,12 +123,10 @@
             const diff = now - start;
             const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-            // موقع Z بناءً على الحركة الحلزونية
             const angle = (dayOfYear / 365.0) * 2 * Math.PI;
             const z = Math.round(50 + 50 * Math.cos(angle));
 
-            // حساب المستشعرات الجوية بناءً على موقع Z ودقة النظرية
-            document.getElementById('sensor-z').innerText = z + "% (مستوى الارتفاع الرأسي)";
+            document.getElementById('sensor-z').innerText = z + "% (ارتفاع عمود Z)";
             
             let pressure = (1013.25 + (z - 50) * 0.35).toFixed(1) + " hPa";
             let wind = z > 70 ? "شمالية غربية نشطة (28 كم/س)" : (z < 30 ? "جنوبية شرقية هادئة (8 كم/س)" : "متوسطة الاتجاه (15 كم/س)");
@@ -144,7 +148,6 @@
             document.getElementById('sensor-humidity').innerText = humidity;
             document.getElementById('sensor-climate').innerText = climateText;
 
-            // بناء التقويم الشبكي للأشهر الاثني عشر بدقة الدخول الزمنية
             const container = document.getElementById('calendar-container');
             const entries = calculateExactEntries();
 
@@ -166,21 +169,19 @@
                     </div>
                 `;
 
-                // شبكة أيام الأسبوع
                 let gridHtml = `<div class="calendar-grid mb-1">`;
                 weekDays.forEach(wd => {
                     gridHtml += `<div class="day-header">${wd}</div>`;
                 });
                 gridHtml += `</div><div class="calendar-grid">`;
 
-                // إزاحة بداية الأيام لكل شهر بناءً على معامل الانحصار الفلكي
-                let startOffset = (i * 4) % 7;
+                let startOffset = (i * 3) % 7;
                 for (let b = 0; b < startOffset; b++) {
                     gridHtml += `<div class="day-cell opacity-10"></div>`;
                 }
 
                 for (let d = 1; d <= totalDays; d++) {
-                    let isKeyDay = (i === 9 && d === 1) || (i === 10 && d === 1) || (i === 11 && d === 10);
+                    let isKeyDay = (i === 1 && d === 1) || (i === 2 && d === 1) || (i === 5 && d === 1);
                     let cellStyle = isKeyDay ? "bg-amber-500 text-black font-bold shadow-md" : "bg-gray-800/70 hover:bg-gray-700 text-gray-200";
                     gridHtml += `<div class="day-cell ${cellStyle}">${d}</div>`;
                 }
