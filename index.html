@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>نظام المهندس آل عكاب الفلكي - التقويم القمري المتسلسل</title>
+    <title>نظام المهندس آل عكاب الفلكي - معادلة الإسقاط الشمسي</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/moon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,14 +20,14 @@
 
     <header class="text-center my-4">
         <h1 class="text-xl font-bold text-amber-400">نظام المهندس آل عكاب الفلكي</h1>
-        <p class="text-xs text-gray-400 mt-1">التقويم القمري المتسلسل المبني على حركة عمود السبرنك والكسور الدقيقة</p>
+        <p id="year-type-label" class="text-xs text-emerald-400 mt-1">جاري حساب الإسقاط القمري على السنة الشمسية...</p>
     </header>
 
-    <!-- لوحة المستشعرات الجوية والمناخية -->
+    <!-- لوحة المستشعرات الجوية ومعادلة الإسقاط -->
     <div class="card p-4 rounded-2xl mb-5 shadow-2xl border-cyan-500/30">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
-            <span class="text-xs font-bold text-cyan-400">📡 شبكة المستشعرات الجوية الفلكية</span>
-            <span id="sensor-mode" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">مصحح بالكسور</span>
+            <span class="text-xs font-bold text-cyan-400">📡 مستشعرات عمود Z والإسقاط الشمسي</span>
+            <span id="sensor-mode" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">معادلة الزحزحة المدارية</span>
         </div>
         <div class="grid grid-cols-2 gap-2.5 text-xs">
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
@@ -35,15 +35,15 @@
                 <span id="sensor-z" class="font-bold text-amber-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">الضغط الجوي الفلكي:</span>
-                <span id="sensor-pressure" class="font-bold text-sky-300 text-xs">-</span>
+                <span class="text-gray-400 block text-[10px]">معامل الزحزحة الشمسية:</span>
+                <span id="sensor-shift" class="font-bold text-sky-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">سرعة واتجاه الرياح:</span>
+                <span class="text-gray-400 block text-[10px]">الضغط والرياح:</span>
                 <span id="sensor-wind" class="font-bold text-emerald-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">الرطوبة ونسبة التكثف:</span>
+                <span class="text-gray-400 block text-[10px]">الرطوبة والتكثف:</span>
                 <span id="sensor-humidity" class="font-bold text-indigo-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 col-span-2">
@@ -53,11 +53,10 @@
         </div>
     </div>
 
-    <!-- حاوية التقويم الشبكي للأشهر الـ 12 المتسلسلة -->
+    <!-- حاوية التقويم الشبكي للأشهر الـ 12 مع التواريخ الشمسية -->
     <div id="calendar-container" class="space-y-4"></div>
 
     <script>
-        // الأسماء القمرية الاثني عشر بالتسلسل الدقيق
         const monthNames = [
             "1. شهر رمضان المبارك",
             "2. شهر شوال",
@@ -73,11 +72,20 @@
             "12. شهر شعبان المعظم"
         ];
 
-        // خوارزمية أطوال الأشهر مع ترحيل الكسور الدقيق
-        function getMonthData(m) {
+        const solarMonthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+        const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
+
+        function checkLeapYear() {
+            const currentYear = new Date().getFullYear();
+            return (currentYear % 4 === 0);
+        }
+
+        function getMonthData(m, isLeap) {
             let exactFraction = 0.25;
-            if (m === 1) { exactFraction = 0.4625; } 
-            else if (m === 2) { exactFraction = 0.375; }
+            let leapBonus = isLeap && (m === 1 || m === 2) ? 0.25 : 0.0;
+
+            if (m === 1) { exactFraction = 0.4625 + leapBonus; } 
+            else if (m === 2) { exactFraction = 0.375 + leapBonus; }
             else if (m === 4) { exactFraction = 0.125; }
             else if (m === 6) { exactFraction = 0.0875; } 
             else if (m >= 10) { exactFraction = 0.40; }
@@ -85,91 +93,79 @@
             let totalExactDays = 29 + exactFraction;
             let integerDays = totalExactDays >= 29.35 ? 30 : 29;
 
-            return {
-                exact: totalExactDays.toFixed(4),
-                days: integerDays
-            };
+            return { exact: totalExactDays.toFixed(4), days: integerDays };
         }
 
-        const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
+        // معادلة تحويل اليوم الشمسي التراكمي إلى تاريخ شمسي وساعة
+        function convertSolarDayToDate(solarDayAccumulated, year) {
+            let baseDate = new Date(year, 0, 1); // 1 يناير
+            let entryTime = new Date(baseDate.getTime() + (solarDayAccumulated * 24 * 60 * 60 * 1000));
+            
+            let day = entryTime.getDate();
+            let month = solarMonthNames[entryTime.getMonth()];
+            let hours = entryTime.getHours().toString().padStart(2, '0');
+            let minutes = entryTime.getMinutes().toString().padStart(2, '0');
 
-        function calculateExactEntries() {
-            let entries = [];
-            let cumulativeHours = 0;
-
-            for (let i = 1; i <= 12; i++) {
-                let mData = getMonthData(i);
-                let durationHours = parseFloat(mData.exact) * 24;
-
-                let dayOfMonthIndex = (Math.floor(cumulativeHours / 24) % 30) + 1;
-                let hourOfDay = Math.floor(cumulativeHours % 24);
-                let minuteOfHour = Math.floor(((cumulativeHours % 24) % 1) * 60);
-
-                entries.push({
-                    month: i,
-                    exactDuration: mData.exact,
-                    integerDays: mData.days,
-                    entryString: `اليوم ${dayOfMonthIndex} | الساعة ${hourOfDay.toString().padStart(2,'0')}:${minuteOfHour.toString().padStart(2,'0')}`
-                });
-
-                cumulativeHours += durationHours;
-            }
-            return entries;
+            return `${day} ${month} - الساعة ${hours}:${minutes}`;
         }
 
         function initApp() {
+            const isLeap = checkLeapYear();
+            const currentYear = new Date().getFullYear();
+            document.getElementById('year-type-label').innerText = isLeap 
+                ? `🌟 سنة كبيسة فلكية (${currentYear}) - 355 يوماً` 
+                : `🌙 سنة بسيطة فلكية (${currentYear}) - 354 يوماً`;
+
             const now = new Date();
             const start = new Date(now.getFullYear(), 0, 0);
             const diff = now - start;
             const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-            const angle = (dayOfYear / 365.0) * 2 * Math.PI;
+            const angle = (dayOfYear / 365.2422) * 2 * Math.PI;
             const z = Math.round(50 + 50 * Math.cos(angle));
 
             document.getElementById('sensor-z').innerText = z + "% (ارتفاع عمود Z)";
+            document.getElementById('sensor-shift').innerText = (10.8922).toFixed(4) + " يوم/سنة (معامل الزحزحة)";
             
             let pressure = (1013.25 + (z - 50) * 0.35).toFixed(1) + " hPa";
-            let wind = z > 70 ? "شمالية غربية نشطة (28 كم/س)" : (z < 30 ? "جنوبية شرقية هادئة (8 كم/س)" : "متوسطة الاتجاه (15 كم/س)");
+            let wind = z > 70 ? "شمالية غربية (28 كم/س)" : (z < 30 ? "جنوبية شرقية (8 كم/س)" : "متوسطة (15 كم/س)");
             let humidity = Math.min(95, Math.max(15, Math.round(55 + (z - 50) * 0.75))) + "%";
             
-            let climateText = "أجواء معتدلة ومستقرة";
-            if (z >= 85) {
-                climateText = "❄️ برد قارس، كثافة عالية، أمطار وثلوج محتملة";
-            } else if (z < 25) {
-                climateText = "🔥 حرارة شديدة، جفاف الغلاف، استقرار تام";
-            } else if (z > 50) {
-                climateText = "🌧️ تكثف سحابي هابط، أمطار موسمية خفيفة";
-            } else {
-                climateText = "⛅ اعتدال انتقالي، حركة رياح رطبة";
-            }
+            let climateText = z >= 85 ? "❄️ برد قارس، كثافة عالية، أمطار وثلوج" : (z < 25 ? "🔥 حرارة شديدة، جفاف الغلاف" : "⛅ اعتدال انتقالي لطيف");
 
-            document.getElementById('sensor-pressure').innerText = pressure;
             document.getElementById('sensor-wind').innerText = wind;
             document.getElementById('sensor-humidity').innerText = humidity;
             document.getElementById('sensor-climate').innerText = climateText;
 
             const container = document.getElementById('calendar-container');
-            const entries = calculateExactEntries();
+            let cumulativeLunarDays = 0;
+            
+            // بداية دخول أول شهر قمري في السنة الشمسية (بزاوية الانقلاب)
+            const solarOffsetBase = 11.25; // يوم الإسقاط الابتدائي
 
             for (let i = 1; i <= 12; i++) {
-                let monthData = entries[i-1];
-                let totalDays = monthData.integerDays;
+                let mData = getMonthData(i, isLeap);
+                let durationDays = parseFloat(mData.exact);
+
+                // حساب التراكم الشمسي بمعادلة الإسقاط
+                let solarDayEntry = (solarOffsetBase + (cumulativeLunarDays * (365.2422 / 354.25))) % 365.2422;
+                let solarDateString = convertSolarDayToDate(solarDayEntry, currentYear);
 
                 let card = document.createElement('div');
                 card.className = "card p-3.5 rounded-2xl shadow-xl";
 
                 let headerHtml = `
-                    <div class="flex justify-between items-center mb-2 border-b border-gray-800 pb-2">
+                    <div class="flex justify-between items-center mb-1 border-b border-gray-800 pb-2">
                         <span class="font-bold text-amber-400 text-xs">${monthNames[i-1]}</span>
-                        <span class="text-[11px] text-emerald-400 font-mono">المدة: ${monthData.exactDuration} يوم</span>
+                        <span class="text-[11px] text-emerald-400 font-mono">المدة: ${mData.exact} يوم</span>
                     </div>
-                    <div class="text-[11px] text-cyan-300 mb-2.5 bg-black/50 p-1.5 rounded-lg border border-cyan-900/40 flex justify-between items-center">
-                        <span>⏱️ لحظة الدخول الفلكية الدقيقة:</span>
-                        <span class="font-bold text-white">${monthData.entryString}</span>
+                    <div class="text-[10px] text-cyan-300 mb-1 bg-black/60 p-1.5 rounded-lg border border-cyan-900/40 flex justify-between items-center">
+                        <span>☀️ دخول الشهر بالسنة الشمسية:</span>
+                        <span class="font-bold text-amber-300">${solarDateString}</span>
                     </div>
                 `;
 
-                let gridHtml = `<div class="calendar-grid mb-1">`;
+                let gridHtml = `<div class="calendar-grid mb-1 mt-2">`;
                 weekDays.forEach(wd => {
                     gridHtml += `<div class="day-header">${wd}</div>`;
                 });
@@ -180,7 +176,7 @@
                     gridHtml += `<div class="day-cell opacity-10"></div>`;
                 }
 
-                for (let d = 1; d <= totalDays; d++) {
+                for (let d = 1; d <= mData.days; d++) {
                     let isKeyDay = (i === 1 && d === 1) || (i === 2 && d === 1) || (i === 5 && d === 1);
                     let cellStyle = isKeyDay ? "bg-amber-500 text-black font-bold shadow-md" : "bg-gray-800/70 hover:bg-gray-700 text-gray-200";
                     gridHtml += `<div class="day-cell ${cellStyle}">${d}</div>`;
@@ -189,6 +185,8 @@
                 gridHtml += `</div>`;
                 card.innerHTML = headerHtml + gridHtml;
                 container.appendChild(card);
+
+                cumulativeLunarDays += durationDays;
             }
         }
 
