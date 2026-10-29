@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>نظام المهندس آل عكاب الفلكي - معادلة الإسقاط الشمسي</title>
+    <title>التقويم الطبيعي الحي - نظام المهندس آل عكاب</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/moon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,185 +12,139 @@
         body { background-color: #07090e; color: #e6edf3; font-family: system-ui, -apple-system, sans-serif; }
         .card { background: rgba(13, 17, 23, 0.9); border: 1px solid rgba(48, 54, 61, 0.6); backdrop-filter: blur(14px); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
-        .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border-radius: 5px; background: rgba(22, 27, 34, 0.8); }
+        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; border-radius: 6px; background: rgba(22, 27, 34, 0.8); }
         .day-header { font-size: 0.65rem; font-weight: bold; color: #8b949e; padding-bottom: 3px; }
     </style>
 </head>
 <body class="p-3 md:p-6 max-w-xl mx-auto pb-24">
 
     <header class="text-center my-4">
-        <h1 class="text-xl font-bold text-amber-400">نظام المهندس آل عكاب الفلكي</h1>
-        <p id="year-type-label" class="text-xs text-emerald-400 mt-1">جاري حساب الإسقاط القمري على السنة الشمسية...</p>
+        <h1 class="text-xl font-bold text-amber-400">تقويم الزمن الحي والنبض الكوني</h1>
+        <p id="system-subtitle" class="text-xs text-emerald-400 mt-1">مرجعية رمضان الشتوي - تحرر تام من النظام الستيني</p>
     </header>
 
-    <!-- لوحة المستشعرات الجوية ومعادلة الإسقاط -->
+    <!-- لوحة المستشعرات ونظرية الزمن المتغير -->
     <div class="card p-4 rounded-2xl mb-5 shadow-2xl border-cyan-500/30">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
-            <span class="text-xs font-bold text-cyan-400">📡 مستشعرات عمود Z والإسقاط الشمسي</span>
-            <span id="sensor-mode" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">معادلة الزحزحة المدارية</span>
+            <span class="text-xs font-bold text-cyan-400">📡 محرك الغلاف الجوي وعمود Z</span>
+            <span id="sensor-status" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">نبض حي متصل</span>
         </div>
         <div class="grid grid-cols-2 gap-2.5 text-xs">
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">موقع عمود Z (الارتفاع):</span>
-                <span id="sensor-z" class="font-bold text-amber-300 text-xs">-</span>
+                <span class="text-gray-400 block text-[10px]">موقع عمود Z (الموسم):</span>
+                <span id="val-z" class="font-bold text-amber-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">معامل الزحزحة الشمسية:</span>
-                <span id="sensor-shift" class="font-bold text-sky-300 text-xs">-</span>
+                <span class="text-gray-400 block text-[10px]">ساعة النهار الحيّة:</span>
+                <span id="val-day-hour" class="font-bold text-sky-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">الضغط والرياح:</span>
-                <span id="sensor-wind" class="font-bold text-emerald-300 text-xs">-</span>
+                <span class="text-gray-400 block text-[10px]">ساعة الليل الحيّة:</span>
+                <span id="val-night-hour" class="font-bold text-indigo-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">الرطوبة والتكثف:</span>
-                <span id="sensor-humidity" class="font-bold text-indigo-300 text-xs">-</span>
+                <span class="text-gray-400 block text-[10px]">حالة الهلال والبداية:</span>
+                <span class="font-bold text-emerald-300 text-xs">مرصود بالعين (ثابت)</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 col-span-2">
-                <span class="text-gray-400 block text-[10px]">المناخ والطقس الحقيقي:</span>
-                <span id="sensor-climate" class="font-bold text-rose-300 text-xs">-</span>
+                <span class="text-gray-400 block text-[10px]">النبض المناخي والموسمي:</span>
+                <span id="val-climate" class="font-bold text-rose-300 text-xs">-</span>
             </div>
         </div>
     </div>
 
-    <!-- حاوية التقويم الشبكي للأشهر الـ 12 مع التواريخ الشمسية -->
+    <!-- الأشهر الـ 12 المتباينة حسب النظرية (رمضان شتوي إلى شعبان) -->
     <div id="calendar-container" class="space-y-4"></div>
 
     <script>
-        const monthNames = [
-            "1. شهر رمضان المبارك",
-            "2. شهر شوال",
-            "3. شهر ذو القعدة",
-            "4. شهر ذو الحجة",
-            "5. شهر محرم الحرام",
-            "6. شهر صفر",
-            "7. شهر ربيع الأول",
-            "8. شهر ربيع الثاني",
-            "9. شهر جمادى الأولى",
-            "10. شهر جمادى الآخرة",
-            "11. شهر رجب المرجب",
-            "12. شهر شعبان المعظم"
+        // تسلسل الأشهر مع مرجعية رمضان الشتوي
+        const naturalMonths = [
+            { id: 1, name: "1. شهر رمضان المبارك", season: "ذروة الشتاء (مرجعي)", baseDays: 30, type: "winter-compressed" },
+            { id: 2, name: "2. شهر شوال", season: "الانتقال الربيعي الأول", baseDays: 30, type: "transition" },
+            { id: 3, name: "3. شهر ذو القعدة", season: "الانتقال الربيعي المتأخر", baseDays: 30, type: "transition" },
+            { id: 4, name: "4. شهر ذو الحجة", season: "بداية الصيف والمناسك", baseDays: 31, type: "summer-stretched" },
+            { id: 5, name: "5. شهر محرم الحرام", season: "ذروة الصيف والحرارة", baseDays: 31, type: "summer-stretched" },
+            { id: 6, name: "6. شهر صفر", season: "ذروة الصيف المطمط", baseDays: 31, type: "summer-stretched" },
+            { id: 7, name: "7. شهر ربيع الأول", season: "بداية الاعتدال الخريفي", baseDays: 30, type: "transition" },
+            { id: 8, name: "8. شهر ربيع الثاني", season: "الخريف المنتظم", baseDays: 30, type: "transition" },
+            { id: 9, name: "9. شهر جمادى الأولى", season: "مقدمات البرد الشتوي", baseDays: 30, type: "winter-compressed" },
+            { id: 10, name: "10. شهر جمادى الآخرة", season: "الدخول في الشتاء", baseDays: 30, type: "winter-compressed" },
+            { id: 11, name: "11. شهر رجب المرجب", season: "عمق الشتاء والكثافة", baseDays: 30, type: "winter-compressed" },
+            { id: 12, name: "12. شهر شعبان المعظم", season: "الاستعداد لرمضان", baseDays: 30, type: "winter-compressed" }
         ];
 
-        const solarMonthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
 
-        function checkLeapYear() {
-            const currentYear = new Date().getFullYear();
-            return (currentYear % 4 === 0);
-        }
-
-        function getMonthData(m, isLeap) {
-            let exactFraction = 0.25;
-            let leapBonus = isLeap && (m === 1 || m === 2) ? 0.25 : 0.0;
-
-            if (m === 1) { exactFraction = 0.4625 + leapBonus; } 
-            else if (m === 2) { exactFraction = 0.375 + leapBonus; }
-            else if (m === 4) { exactFraction = 0.125; }
-            else if (m === 6) { exactFraction = 0.0875; } 
-            else if (m >= 10) { exactFraction = 0.40; }
-
-            let totalExactDays = 29 + exactFraction;
-            let integerDays = totalExactDays >= 29.35 ? 30 : 29;
-
-            return { exact: totalExactDays.toFixed(4), days: integerDays };
-        }
-
-        // معادلة تحويل اليوم الشمسي التراكمي إلى تاريخ شمسي وساعة
-        function convertSolarDayToDate(solarDayAccumulated, year) {
-            let baseDate = new Date(year, 0, 1); // 1 يناير
-            let entryTime = new Date(baseDate.getTime() + (solarDayAccumulated * 24 * 60 * 60 * 1000));
-            
-            let day = entryTime.getDate();
-            let month = solarMonthNames[entryTime.getMonth()];
-            let hours = entryTime.getHours().toString().padStart(2, '0');
-            let minutes = entryTime.getMinutes().toString().padStart(2, '0');
-
-            return `${day} ${month} - الساعة ${hours}:${minutes}`;
-        }
-
-        function initApp() {
-            const isLeap = checkLeapYear();
-            const currentYear = new Date().getFullYear();
-            document.getElementById('year-type-label').innerText = isLeap 
-                ? `🌟 سنة كبيسة فلكية (${currentYear}) - 355 يوماً` 
-                : `🌙 سنة بسيطة فلكية (${currentYear}) - 354 يوماً`;
-
+        function initNaturalCalendar() {
             const now = new Date();
-            const start = new Date(now.getFullYear(), 0, 0);
-            const diff = now - start;
-            const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
 
-            const angle = (dayOfYear / 365.2422) * 2 * Math.PI;
-            const z = Math.round(50 + 50 * Math.cos(angle));
+            // حساب موقع عمود Z (من 0 إلى 100)
+            const zAngle = (dayOfYear / 365.2422) * 2 * Math.PI;
+            const zValue = Math.round(50 + 50 * Math.cos(zAngle));
 
-            document.getElementById('sensor-z').innerText = z + "% (ارتفاع عمود Z)";
-            document.getElementById('sensor-shift').innerText = (10.8922).toFixed(4) + " يوم/سنة (معامل الزحزحة)";
-            
-            let pressure = (1013.25 + (z - 50) * 0.35).toFixed(1) + " hPa";
-            let wind = z > 70 ? "شمالية غربية (28 كم/س)" : (z < 30 ? "جنوبية شرقية (8 كم/س)" : "متوسطة (15 كم/س)");
-            let humidity = Math.min(95, Math.max(15, Math.round(55 + (z - 50) * 0.75))) + "%";
-            
-            let climateText = z >= 85 ? "❄️ برد قارس، كثافة عالية، أمطار وثلوج" : (z < 25 ? "🔥 حرارة شديدة، جفاف الغلاف" : "⛅ اعتدال انتقالي لطيف");
+            // حساب ساعات النهار والليل المتغيرة حسب نظريتك
+            // في الشتاء (Z عالي): نهار قصير (مثلاً 50 دقيقة)، ليل طويل (70 دقيقة)
+            // في الصيف (Z منخفض): نهار طويل (مثلاً 84 دقيقة)، ليل قصير (48 دقيقة)
+            let dayHourMin = (60 - 10 * (zValue / 50)).toFixed(1);
+            let nightHourMin = (60 + 10 * (zValue / 50)).toFixed(1);
 
-            document.getElementById('sensor-wind').innerText = wind;
-            document.getElementById('sensor-humidity').innerText = humidity;
-            document.getElementById('sensor-climate').innerText = climateText;
+            document.getElementById('val-z').innerText = zValue + "% (عمود Z)";
+            document.getElementById('val-day-hour').innerText = dayHourMin + " دقيقة للساعة";
+            document.getElementById('val-night-hour').innerText = nightHourMin + " دقيقة للساعة";
+
+            let climateStr = zValue >= 75 ? "❄️ شتاء قارس: انكماش زمني، نهار قصير، كثافة عالية" :
+                             (zValue <= 25 ? "🔥 صيف لاهب: تمدد زمني، نهار طويل جداً، مطمطاة ثقيلة" : "⛅ اعتدال موسمي انتقالي متوازن");
+            document.getElementById('val-climate').innerText = climateStr;
 
             const container = document.getElementById('calendar-container');
-            let cumulativeLunarDays = 0;
-            
-            // بداية دخول أول شهر قمري في السنة الشمسية (بزاوية الانقلاب)
-            const solarOffsetBase = 11.25; // يوم الإسقاط الابتدائي
+            container.innerHTML = "";
 
-            for (let i = 1; i <= 12; i++) {
-                let mData = getMonthData(i, isLeap);
-                let durationDays = parseFloat(mData.exact);
-
-                // حساب التراكم الشمسي بمعادلة الإسقاط
-                let solarDayEntry = (solarOffsetBase + (cumulativeLunarDays * (365.2422 / 354.25))) % 365.2422;
-                let solarDateString = convertSolarDayToDate(solarDayEntry, currentYear);
-
+            naturalMonths.forEach(m => {
                 let card = document.createElement('div');
                 card.className = "card p-3.5 rounded-2xl shadow-xl";
 
                 let headerHtml = `
                     <div class="flex justify-between items-center mb-1 border-b border-gray-800 pb-2">
-                        <span class="font-bold text-amber-400 text-xs">${monthNames[i-1]}</span>
-                        <span class="text-[11px] text-emerald-400 font-mono">المدة: ${mData.exact} يوم</span>
+                        <span class="font-bold text-amber-400 text-xs">${m.name}</span>
+                        <span class="text-[10px] text-cyan-300 font-mono">${m.season}</span>
                     </div>
-                    <div class="text-[10px] text-cyan-300 mb-1 bg-black/60 p-1.5 rounded-lg border border-cyan-900/40 flex justify-between items-center">
-                        <span>☀️ دخول الشهر بالسنة الشمسية:</span>
-                        <span class="font-bold text-amber-300">${solarDateString}</span>
+                    <div class="text-[10px] text-emerald-400 mb-2 flex justify-between">
+                        <span>🌙 رؤية الهلال: معتمدة وثابتة</span>
+                        <span class="font-bold text-amber-300">المدة الحية: ${m.baseDays} يوماً</span>
                     </div>
                 `;
 
-                let gridHtml = `<div class="calendar-grid mb-1 mt-2">`;
+                let gridHtml = `<div class="calendar-grid mb-1">`;
                 weekDays.forEach(wd => {
                     gridHtml += `<div class="day-header">${wd}</div>`;
                 });
                 gridHtml += `</div><div class="calendar-grid">`;
 
-                let startOffset = (i * 3) % 7;
-                for (let b = 0; b < startOffset; b++) {
+                let offset = (m.id * 3) % 7;
+                for (let b = 0; b < offset; b++) {
                     gridHtml += `<div class="day-cell opacity-10"></div>`;
                 }
 
-                for (let d = 1; d <= mData.days; d++) {
-                    let isKeyDay = (i === 1 && d === 1) || (i === 2 && d === 1) || (i === 5 && d === 1);
-                    let cellStyle = isKeyDay ? "bg-amber-500 text-black font-bold shadow-md" : "bg-gray-800/70 hover:bg-gray-700 text-gray-200";
-                    gridHtml += `<div class="day-cell ${cellStyle}">${d}</div>`;
+                for (let d = 1; d <= m.baseDays; d++) {
+                    let isFirstDay = (d === 1);
+                    let cellClass = isFirstDay ? "bg-amber-500 text-black font-bold shadow" : "bg-gray-800/70 text-gray-200 hover:bg-gray-700";
+                    gridHtml += `
+                        <div class="day-cell ${cellClass}">
+                            <span>${d}</span>
+                            ${isFirstDay ? '<span class="text-[8px] opacity-80">هلال</span>' : ''}
+                        </div>
+                    `;
                 }
 
                 gridHtml += `</div>`;
                 card.innerHTML = headerHtml + gridHtml;
                 container.appendChild(card);
-
-                cumulativeLunarDays += durationDays;
-            }
+            });
         }
 
-        initApp();
+        initNaturalCalendar();
     </script>
 </body>
 </html>
