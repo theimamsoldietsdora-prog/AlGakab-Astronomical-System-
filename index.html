@@ -20,7 +20,7 @@
 
     <header class="text-center my-4">
         <h1 class="text-xl font-bold text-amber-400">تقويم الزمن الحي والنبض الكوني</h1>
-        <p id="system-subtitle" class="text-xs text-emerald-400 mt-1">مرجعية رمضان الشتوي - تحرر تام من النظام الستيني</p>
+        <p id="system-subtitle" class="text-xs text-emerald-400 mt-1">مرجعية رمضان الشتوي - محوّل المقاييس المعيارية</p>
     </header>
 
     <!-- لوحة المستشعرات ونظرية الزمن المتغير -->
@@ -53,24 +53,24 @@
         </div>
     </div>
 
-    <!-- الأشهر الـ 12 المتباينة حسب النظرية (رمضان شتوي إلى شعبان) -->
+    <!-- الأشهر الـ 12 المتباينة مع التواريخ المعيارية المقابلة -->
     <div id="calendar-container" class="space-y-4"></div>
 
     <script>
-        // تسلسل الأشهر مع مرجعية رمضان الشتوي
+        // تسلسل الأشهر مع المرجعية الستينية الشمسية للبداية
         const naturalMonths = [
-            { id: 1, name: "1. شهر رمضان المبارك", season: "ذروة الشتاء (مرجعي)", baseDays: 30, type: "winter-compressed" },
-            { id: 2, name: "2. شهر شوال", season: "الانتقال الربيعي الأول", baseDays: 30, type: "transition" },
-            { id: 3, name: "3. شهر ذو القعدة", season: "الانتقال الربيعي المتأخر", baseDays: 30, type: "transition" },
-            { id: 4, name: "4. شهر ذو الحجة", season: "بداية الصيف والمناسك", baseDays: 31, type: "summer-stretched" },
-            { id: 5, name: "5. شهر محرم الحرام", season: "ذروة الصيف والحرارة", baseDays: 31, type: "summer-stretched" },
-            { id: 6, name: "6. شهر صفر", season: "ذروة الصيف المطمط", baseDays: 31, type: "summer-stretched" },
-            { id: 7, name: "7. شهر ربيع الأول", season: "بداية الاعتدال الخريفي", baseDays: 30, type: "transition" },
-            { id: 8, name: "8. شهر ربيع الثاني", season: "الخريف المنتظم", baseDays: 30, type: "transition" },
-            { id: 9, name: "9. شهر جمادى الأولى", season: "مقدمات البرد الشتوي", baseDays: 30, type: "winter-compressed" },
-            { id: 10, name: "10. شهر جمادى الآخرة", season: "الدخول في الشتاء", baseDays: 30, type: "winter-compressed" },
-            { id: 11, name: "11. شهر رجب المرجب", season: "عمق الشتاء والكثافة", baseDays: 30, type: "winter-compressed" },
-            { id: 12, name: "12. شهر شعبان المعظم", season: "الاستعداد لرمضان", baseDays: 30, type: "winter-compressed" }
+            { id: 1, name: "1. شهر رمضان المبارك", season: "ذروة الشتاء (مرجعي)", baseDays: 30, standardStart: "22 كانون الأول / ديسمبر" },
+            { id: 2, name: "2. شهر شوال", season: "الانتقال الربيعي الأول", baseDays: 30, standardStart: "21 كانون الثاني / يناير" },
+            { id: 3, name: "3. شهر ذو القعدة", season: "الانتقال الربيعي المتأخر", baseDays: 30, standardStart: "20 شباط / فبراير" },
+            { id: 4, name: "4. شهر ذو الحجة", season: "بداية الصيف والمناسك", baseDays: 31, standardStart: "22 آذار / مارس" },
+            { id: 5, name: "5. شهر محرم الحرام", season: "ذروة الصيف والحرارة", baseDays: 31, standardStart: "22 نيسان / أبريل" },
+            { id: 6, name: "6. شهر صفر", season: "ذروة الصيف المطمط", baseDays: 31, standardStart: "23 أيار / مايو" },
+            { id: 7, name: "7. شهر ربيع الأول", season: "بداية الاعتدال الخريفي", baseDays: 30, standardStart: "23 حزيران / يونيو" },
+            { id: 8, name: "8. شهر ربيع الثاني", season: "الخريف المنتظم", baseDays: 30, standardStart: "23 تموز / تموز" },
+            { id: 9, name: "9. شهر جمادى الأولى", season: "مقدمات البرد الشتوي", baseDays: 30, standardStart: "22 آب / أغسطس" },
+            { id: 10, name: "10. شهر جمادى الآخرة", season: "الدخول في الشتاء", baseDays: 30, standardStart: "21 أيلول / سبتمبر" },
+            { id: 11, name: "11. شهر رجب المرجب", season: "عمق الشتاء والكثافة", baseDays: 30, standardStart: "21 تشرين الأول / أكتوبر" },
+            { id: 12, name: "12. شهر شعبان المعظم", season: "الاستعداد لرمضان", baseDays: 30, standardStart: "20 تشرين الثاني / نوفمبر" }
         ];
 
         const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
@@ -80,13 +80,10 @@
             const startOfYear = new Date(now.getFullYear(), 0, 1);
             const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
 
-            // حساب موقع عمود Z (من 0 إلى 100)
+            // حساب موقع عمود Z
             const zAngle = (dayOfYear / 365.2422) * 2 * Math.PI;
             const zValue = Math.round(50 + 50 * Math.cos(zAngle));
 
-            // حساب ساعات النهار والليل المتغيرة حسب نظريتك
-            // في الشتاء (Z عالي): نهار قصير (مثلاً 50 دقيقة)، ليل طويل (70 دقيقة)
-            // في الصيف (Z منخفض): نهار طويل (مثلاً 84 دقيقة)، ليل قصير (48 دقيقة)
             let dayHourMin = (60 - 10 * (zValue / 50)).toFixed(1);
             let nightHourMin = (60 + 10 * (zValue / 50)).toFixed(1);
 
@@ -110,8 +107,12 @@
                         <span class="font-bold text-amber-400 text-xs">${m.name}</span>
                         <span class="text-[10px] text-cyan-300 font-mono">${m.season}</span>
                     </div>
+                    <div class="bg-black/60 p-2 rounded-lg border border-gray-800/80 mb-2 flex justify-between items-center text-[10px]">
+                        <span class="text-gray-400">📏 بداية الشهر بالمقياس الستيني المعياري:</span>
+                        <span class="font-bold text-emerald-300 font-mono">${m.standardStart}</span>
+                    </div>
                     <div class="text-[10px] text-emerald-400 mb-2 flex justify-between">
-                        <span>🌙 رؤية الهلال: معتمدة وثابتة</span>
+                        <span>🌙 رؤية الهلال: مطابقة ومثبتة</span>
                         <span class="font-bold text-amber-300">المدة الحية: ${m.baseDays} يوماً</span>
                     </div>
                 `;
