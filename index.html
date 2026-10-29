@@ -14,20 +14,25 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
         .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; border-radius: 6px; background: rgba(22, 27, 34, 0.8); }
         .day-header { font-size: 0.65rem; font-weight: bold; color: #8b949e; padding-bottom: 3px; }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
+            50% { box-shadow: 0 0 20px rgba(56, 189, 248, 1); }
+        }
+        .today-indicator { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: bold; animation: pulse-glow 2s infinite; border: 1px solid #38bdf8; }
     </style>
 </head>
 <body class="p-3 md:p-6 max-w-xl mx-auto pb-24">
 
     <header class="text-center my-4">
         <h1 class="text-xl font-bold text-amber-400">تقويم الزمن الحي والنبض الكوني</h1>
-        <p id="system-subtitle" class="text-xs text-emerald-400 mt-1">مرجعية رمضان الشتوي - محوّل المقاييس المعيارية</p>
+        <p id="system-subtitle" class="text-xs text-emerald-400 mt-1">مع مؤشر اليوم الحي - هلال 10 كانون الأول</p>
     </header>
 
     <!-- لوحة المستشعرات ونظرية الزمن المتغير -->
     <div class="card p-4 rounded-2xl mb-5 shadow-2xl border-cyan-500/30">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
             <span class="text-xs font-bold text-cyan-400">📡 محرك الغلاف الجوي وعمود Z</span>
-            <span id="sensor-status" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">نبض حي متصل</span>
+            <span id="sensor-status" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">تحديث يومي نشط</span>
         </div>
         <div class="grid grid-cols-2 gap-2.5 text-xs">
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
@@ -43,8 +48,8 @@
                 <span id="val-night-hour" class="font-bold text-indigo-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">حالة الهلال والبداية:</span>
-                <span class="font-bold text-emerald-300 text-xs">مرصود بالعين (ثابت)</span>
+                <span class="text-gray-400 block text-[10px]">اليوم الفلكي الحالي:</span>
+                <span id="val-today-greg" class="font-bold text-emerald-300 text-xs">-</span>
             </div>
             <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 col-span-2">
                 <span class="text-gray-400 block text-[10px]">النبض المناخي والموسمي:</span>
@@ -53,34 +58,37 @@
         </div>
     </div>
 
-    <!-- الأشهر الـ 12 المتباينة مع التواريخ المعيارية المقابلة -->
+    <!-- الأشهر الـ 12 مع مؤشر اليوم الحالي -->
     <div id="calendar-container" class="space-y-4"></div>
 
     <script>
-        // تسلسل الأشهر مع المرجعية الستينية الشمسية للبداية
+        // تسلسل الأشهر مع المرجعية الدقيقة لانطلاقة هلال 10 كانون الأول
         const naturalMonths = [
-            { id: 1, name: "1. شهر رمضان المبارك", season: "ذروة الشتاء (مرجعي)", baseDays: 30, standardStart: "22 كانون الأول / ديسمبر" },
-            { id: 2, name: "2. شهر شوال", season: "الانتقال الربيعي الأول", baseDays: 30, standardStart: "21 كانون الثاني / يناير" },
-            { id: 3, name: "3. شهر ذو القعدة", season: "الانتقال الربيعي المتأخر", baseDays: 30, standardStart: "20 شباط / فبراير" },
-            { id: 4, name: "4. شهر ذو الحجة", season: "بداية الصيف والمناسك", baseDays: 31, standardStart: "22 آذار / مارس" },
-            { id: 5, name: "5. شهر محرم الحرام", season: "ذروة الصيف والحرارة", baseDays: 31, standardStart: "22 نيسان / أبريل" },
-            { id: 6, name: "6. شهر صفر", season: "ذروة الصيف المطمط", baseDays: 31, standardStart: "23 أيار / مايو" },
-            { id: 7, name: "7. شهر ربيع الأول", season: "بداية الاعتدال الخريفي", baseDays: 30, standardStart: "23 حزيران / يونيو" },
-            { id: 8, name: "8. شهر ربيع الثاني", season: "الخريف المنتظم", baseDays: 30, standardStart: "23 تموز / تموز" },
-            { id: 9, name: "9. شهر جمادى الأولى", season: "مقدمات البرد الشتوي", baseDays: 30, standardStart: "22 آب / أغسطس" },
-            { id: 10, name: "10. شهر جمادى الآخرة", season: "الدخول في الشتاء", baseDays: 30, standardStart: "21 أيلول / سبتمبر" },
-            { id: 11, name: "11. شهر رجب المرجب", season: "عمق الشتاء والكثافة", baseDays: 30, standardStart: "21 تشرين الأول / أكتوبر" },
-            { id: 12, name: "12. شهر شعبان المعظم", season: "الاستعداد لرمضان", baseDays: 30, standardStart: "20 تشرين الثاني / نوفمبر" }
+            { id: 1, name: "1. شهر رمضان المبارك", season: "ذروة الشتاء (مرجعي)", baseDays: 30, startMonth: 11, startDay: 10 }, // 10 ديسمبر
+            { id: 2, name: "2. شهر شوال", season: "الانتقال الربيعي الأول", baseDays: 30, startMonth: 0, startDay: 9 },      // 9 يناير
+            { id: 3, name: "3. شهر ذو القعدة", season: "الانتقال الربيعي المتأخر", baseDays: 30, startMonth: 1, startDay: 8 },     // 8 فبراير
+            { id: 4, name: "4. شهر ذو الحجة", season: "بداية الصيف والمناسك", baseDays: 31, startMonth: 2, startDay: 10 },     // 10 مارس
+            { id: 5, name: "5. شهر محرم الحرام", season: "ذروة الصيف والحرارة", baseDays: 31, startMonth: 3, startDay: 10 },    // 10 أبريل
+            { id: 6, name: "6. شهر صفر", season: "ذروة الصيف المطمط", baseDays: 31, startMonth: 4, startDay: 11 },             // 11 مايو
+            { id: 7, name: "7. شهر ربيع الأول", season: "بداية الاعتدال الخريفي", baseDays: 30, startMonth: 5, startDay: 11 },   // 11 يونيو
+            { id: 8, name: "8. شهر ربيع الثاني", season: "الخريف المنتظم", baseDays: 30, startMonth: 6, startDay: 11 },        // 11 يوليو
+            { id: 9, name: "9. شهر جمادى الأولى", season: "مقدمات البرد الشتوي", baseDays: 30, startMonth: 7, startDay: 10 },   // 10 أغسطس
+            { id: 10, name: "10. شهر جمادى الآخرة", season: "الدخول في الشتاء", baseDays: 30, startMonth: 8, startDay: 9 },     // 9 سبتمبر
+            { id: 11, name: "11. شهر رجب المرجب", season: "عمق الشتاء والكثافة", baseDays: 30, startMonth: 9, startDay: 9 },     // 9 أكتوبر
+            { id: 12, name: "12. شهر شعبان المعظم", season: "الاستعداد لرمضان", baseDays: 30, startMonth: 10, startDay: 8 }     // 8 نوفمبر
         ];
 
         const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
 
         function initNaturalCalendar() {
             const now = new Date();
-            const startOfYear = new Date(now.getFullYear(), 0, 1);
-            const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+            const currentYear = now.getFullYear();
+            
+            document.getElementById('val-today-greg').innerText = now.toLocaleDateString('ar-IQ', { day: 'numeric', month: 'long', year: 'numeric' });
 
             // حساب موقع عمود Z
+            const startOfYear = new Date(currentYear, 0, 1);
+            const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
             const zAngle = (dayOfYear / 365.2422) * 2 * Math.PI;
             const zValue = Math.round(50 + 50 * Math.cos(zAngle));
 
@@ -102,17 +110,26 @@
                 let card = document.createElement('div');
                 card.className = "card p-3.5 rounded-2xl shadow-xl";
 
+                // حساب تاريخ البداية الميلادي لهذا الشهر في السنة الحالية
+                let mStartDate = new Date(currentYear, m.startMonth, m.startDay);
+                let mEndDate = new Date(mStartDate);
+                mEndDate.setDate(mStartDate.getDate() + m.baseDays - 1);
+
+                let dateOptions = { day: 'numeric', month: 'short' };
+                let startStr = mStartDate.toLocaleDateString('ar-IQ', dateOptions);
+                let endStr = mEndDate.toLocaleDateString('ar-IQ', dateOptions);
+
                 let headerHtml = `
                     <div class="flex justify-between items-center mb-1 border-b border-gray-800 pb-2">
                         <span class="font-bold text-amber-400 text-xs">${m.name}</span>
                         <span class="text-[10px] text-cyan-300 font-mono">${m.season}</span>
                     </div>
                     <div class="bg-black/60 p-2 rounded-lg border border-gray-800/80 mb-2 flex justify-between items-center text-[10px]">
-                        <span class="text-gray-400">📏 بداية الشهر بالمقياس الستيني المعياري:</span>
-                        <span class="font-bold text-emerald-300 font-mono">${m.standardStart}</span>
+                        <span class="text-gray-400">📏 المقياس الستيني المقابل:</span>
+                        <span class="font-bold text-emerald-300 font-mono">${startStr} إلى ${endStr}</span>
                     </div>
                     <div class="text-[10px] text-emerald-400 mb-2 flex justify-between">
-                        <span>🌙 رؤية الهلال: مطابقة ومثبتة</span>
+                        <span>🌙 رؤية الهلال: مرصودة ومثبتة</span>
                         <span class="font-bold text-amber-300">المدة الحية: ${m.baseDays} يوماً</span>
                     </div>
                 `;
@@ -129,12 +146,29 @@
                 }
 
                 for (let d = 1; d <= m.baseDays; d++) {
+                    // حساب التاريخ الميلادي الفعلي لكل يوم داخل هذا الشهر القمري
+                    let currentDayDate = new Date(mStartDate);
+                    currentDayDate.setDate(mStartDate.getDate() + (d - 1));
+
+                    // التحقق مما إذا كان اليوم المطابق هو اليوم الحقيقي الحالي على جهاز المستخدم
+                    let isToday = (
+                        now.getDate() === currentDayDate.getDate() &&
+                        now.getMonth() === currentDayDate.getDate() || // للتبسيط الدقيق نقارن التاريخ باليوم الميلادي المطابق
+                        (now >= mStartDate && now <= mEndDate && now.toDateString() === currentDayDate.toDateString())
+                    );
+
                     let isFirstDay = (d === 1);
-                    let cellClass = isFirstDay ? "bg-amber-500 text-black font-bold shadow" : "bg-gray-800/70 text-gray-200 hover:bg-gray-700";
+                    
+                    let cellClass = isToday ? "today-indicator" : 
+                                  (isFirstDay ? "bg-amber-500 text-black font-bold shadow" : "bg-gray-800/70 text-gray-200 hover:bg-gray-700");
+
+                    let indicatorLabel = isToday ? '<span class="text-[7px] text-white font-extrabold animate-pulse">اليوم</span>' :
+                                       (isFirstDay ? '<span class="text-[8px] opacity-80">هلال</span>' : '');
+
                     gridHtml += `
-                        <div class="day-cell ${cellClass}">
+                        <div class="day-cell ${cellClass}" title="${currentDayDate.toLocaleDateString('ar-IQ')}">
                             <span>${d}</span>
-                            ${isFirstDay ? '<span class="text-[8px] opacity-80">هلال</span>' : ''}
+                            ${indicatorLabel}
                         </div>
                     `;
                 }
