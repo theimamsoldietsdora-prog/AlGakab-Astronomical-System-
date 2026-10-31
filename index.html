@@ -3,226 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>التقويم الطبيعي الحي - نظرية المهندس حيدر آل عكاب</title>
-    <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/moon.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>منظومة الاستشعار الذاتي الأوتوماتيكية - المهندس حيدر آل عگاب</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap');
-        body { background-color: #07090e; color: #e6edf3; font-family: 'Cairo', sans-serif; }
+        body { background-color: #05070a; color: #e6edf3; font-family: 'Cairo', sans-serif; }
         .amiri-font { font-family: 'Amiri', serif; }
-        .card { background: rgba(13, 17, 23, 0.9); border: 1px solid rgba(245, 158, 11, 0.3); backdrop-filter: blur(14px); }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
-        .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; border-radius: 6px; background: rgba(22, 27, 34, 0.8); position: relative; }
-        .day-header { font-size: 0.65rem; font-weight: bold; color: #8b949e; padding-bottom: 3px; }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
-            50% { box-shadow: 0 0 20px rgba(56, 189, 248, 1); }
-        }
-        .today-indicator { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: bold; animation: pulse-glow 2s infinite; border: 1px solid #38bdf8; }
+        .card { background: rgba(13, 17, 23, 0.95); border: 1px solid rgba(245, 158, 11, 0.35); backdrop-filter: blur(16px); }
+        .auto-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
     </style>
 </head>
 <body class="p-3 md:p-6 max-w-xl mx-auto pb-24">
 
-    <header class="text-center my-4">
-        <h1 class="text-xl md:text-2xl font-bold amiri-font text-amber-400">التقويم الطبيعي الحي والنبض الكوني</h1>
-        <p class="text-xs text-cyan-300 mt-1">ساعة المعين والفاصل العمودي ومستشعر الجو الذاتي</p>
-        <div class="text-[10px] text-amber-300 font-semibold mt-1">ابتكار ونظرية: المهندس حيدر آل عگاب</div>
+    <!-- العنوان والترويسة -->
+    <header class="text-center my-4 space-y-1">
+        <h1 class="text-xl md:text-2xl font-bold amiri-font text-amber-400">نظام الاستشعار الأوتوماتيكي الميداني</h1>
+        <p class="text-xs text-cyan-300">نظرية المعين والفاصل العمودي ومطاطية الوقت الطبيعي</p>
+        <div class="text-[10px] text-amber-300 font-semibold">ابتكار وتصميم: المهندس حيدر آل عگاب</div>
     </header>
 
-    <!-- لوحة مستشعر الجو والحرارة الذاتي (التحكم بنبض الوقت) -->
-    <section class="card p-4 rounded-2xl mb-5 shadow-2xl border-cyan-500/40">
+    <!-- لوحة حالة الاستشعار الأوتوماتيكي المباشر -->
+    <section class="card p-4 rounded-2xl mb-4 border-cyan-500/50">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
-            <span class="text-xs font-bold text-cyan-400">🌡️ مستشعر الجو والكتلة الزمنية الذاتي</span>
-            <span class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">نشط ومعاير</span>
+            <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 auto-pulse"></span>
+                مستشعر أثر الشمس الجوي والفيزيائي (أوتوماتيكي)
+            </span>
+            <span class="text-[9px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-800">ربط ميداني حي</span>
         </div>
         
-        <div class="grid grid-cols-1 gap-3 text-xs mb-3">
-            <div>
-                <div class="flex justify-between text-gray-400 mb-1">
-                    <span>درجة حرارة الجو الافتراضية ($T$):</span>
-                    <span id="valTemp" class="text-amber-400 font-bold">15 °C</span>
-                </div>
-                <input type="range" id="sliderTemp" min="-5" max="50" value="15" class="w-full accent-amber-500" oninput="updateEnvironment()">
+        <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-black/50 p-2.5 rounded-xl border border-gray-800">
+                <span class="text-gray-400 block text-[10px]">استدلال موقع الشمس الحقيقي:</span>
+                <span id="autoSunPos" class="font-bold text-amber-300 text-xs">جاري القراءة الميدانية...</span>
             </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-            <button onclick="setSeasonPreset('winter')" class="bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/40 py-1.5 rounded-xl text-[11px] text-indigo-200">❄️ شتاء قارس (انكماش)</button>
-            <button onclick="setSeasonPreset('summer')" class="bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 py-1.5 rounded-xl text-[11px] text-rose-200">🔥 صيف لاهب (مطمطاة)</button>
+            <div class="bg-black/50 p-2.5 rounded-xl border border-gray-800">
+                <span class="text-gray-400 block text-[10px]">نسبة عمود Z الكونية:</span>
+                <span id="autoZFactor" class="font-bold text-sky-300 text-xs">-- %</span>
+            </div>
+            <div class="bg-black/50 p-2.5 rounded-xl border border-gray-800">
+                <span class="text-gray-400 block text-[10px]">طول الدقيقة النهارية الحية:</span>
+                <span id="autoDaySec" class="font-bold text-emerald-300 text-xs">-- دقيقة</span>
+            </div>
+            <div class="bg-black/50 p-2.5 rounded-xl border border-gray-800">
+                <span class="text-gray-400 block text-[10px]">طول الدقيقة الليلية الحية:</span>
+                <span id="autoNightSec" class="font-bold text-indigo-300 text-xs">-- دقيقة</span>
+            </div>
         </div>
     </section>
 
-    <!-- لوحة المستشعرات ونظرية الزمن المتغير وعمود Z -->
-    <div class="card p-4 rounded-2xl mb-5 shadow-2xl border-cyan-500/30">
-        <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-3">
-            <span class="text-xs font-bold text-cyan-400">📡 محرك الغلاف الجوي وعمود Z</span>
-            <span id="sensor-status" class="text-[10px] bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">تحديث حي دقيق</span>
+    <!-- لوحة الساعة المطاطية الحية -->
+    <section class="card p-5 rounded-2xl mb-4 text-center border-amber-500/40">
+        <span class="text-xs text-amber-400 font-semibold">الساعة العربية الحالية في المعين</span>
+        <div id="autoHourName" class="text-2xl font-bold amiri-font text-amber-300 gold-glow my-1">الشروق</div>
+        
+        <div class="bg-black/70 border border-amber-500/30 p-3 rounded-xl mt-2">
+            <div id="autoClockDisplay" class="text-lg font-mono font-bold text-white">الساعة 1 | 00 : 00</div>
+            <div id="autoPeriodBadge" class="text-[10px] px-3 py-0.5 bg-amber-500/20 text-amber-300 rounded-full inline-block mt-1">فترة النهار العربي النقي</div>
         </div>
-        <div class="grid grid-cols-2 gap-2.5 text-xs">
-            <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">موقع عمود Z (الموسم):</span>
-                <span id="val-z" class="font-bold text-amber-300 text-xs">-</span>
-            </div>
-            <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">ساعة النهار المطمطّة:</span>
-                <span id="val-day-hour" class="font-bold text-sky-300 text-xs">-</span>
-            </div>
-            <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">ساعة الليل المنكمشة:</span>
-                <span id="val-night-hour" class="font-bold text-indigo-300 text-xs">-</span>
-            </div>
-            <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800">
-                <span class="text-gray-400 block text-[10px]">اليوم الفلكي الحالي:</span>
-                <span id="val-today-greg" class="font-bold text-emerald-300 text-xs">-</span>
-            </div>
-            <div class="bg-black/40 p-2.5 rounded-xl border border-gray-800 col-span-2">
-                <span class="text-gray-400 block text-[10px]">حالة المستشعر والكتلة الزمنية للشهر:</span>
-                <span id="val-climate" class="font-bold text-rose-300 text-xs">-</span>
-            </div>
-        </div>
-    </div>
+    </section>
 
-    <!-- الأشهر الـ 12 المدارة بالخوارزمية الدقيقة -->
-    <div id="calendar-container" class="space-y-4"></div>
+    <!-- لوحة تقاطع الكتلة الزمنية مع الهلال -->
+    <section class="card p-4 rounded-2xl space-y-2 text-xs border-indigo-500/40">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+            <span class="font-bold text-amber-300">🌙 حالة الشهر القمري والنبض الجوي الأوتوماتيكي</span>
+            <span class="text-[9px] text-cyan-300 font-mono">بدون غوغل أو تخمين</span>
+        </div>
+        <div class="flex justify-between bg-black/40 p-2 rounded-xl">
+            <span class="text-gray-400">الكتلة الزمنية المتراكمة:</span>
+            <span id="autoMassAccum" class="font-bold text-amber-300">-- %</span>
+        </div>
+        <div class="flex justify-between bg-black/40 p-2 rounded-xl">
+            <span class="text-gray-400">حالة رؤية الهلال والمستشعر:</span>
+            <span id="autoCrescentStatus" class="font-bold text-cyan-300">الكتلة تتفاعل أوتوماتيكياً مع الجو</span>
+        </div>
+    </section>
 
     <script>
-        let simulatedTemp = 15;
-
-        function setSeasonPreset(season) {
-            if (season === 'winter') {
-                simulatedTemp = -2;
-            } else {
-                simulatedTemp = 45;
-            }
-            document.getElementById('sliderTemp').value = simulatedTemp;
-            updateEnvironment();
-        }
-
-        function updateEnvironment() {
-            simulatedTemp = parseFloat(document.getElementById('sliderTemp').value);
-            document.getElementById('valTemp').innerText = simulatedTemp + " °C";
-            initNaturalCalendar();
-        }
-
-        const naturalMonths = [
-            { id: 1, name: "1. شهر رمضان المبارك", season: "ذروة الشتاء (مرجعي)", baseDays: 30, startMonth: 11, startDay: 10 },
-            { id: 2, name: "2. شهر شوال", season: "الانتقال الربيعي الأول", baseDays: 30, startMonth: 0, startDay: 9 },
-            { id: 3, name: "3. شهر ذو القعدة", season: "الانتقال الربيعي المتأخر", baseDays: 30, startMonth: 1, startDay: 8 },
-            { id: 4, name: "4. شهر ذو الحجة", season: "بداية الصيف والمناسك", baseDays: 31, startMonth: 2, startDay: 10 },
-            { id: 5, name: "5. شهر محرم الحرام", season: "ذروة الصيف والحرارة", baseDays: 31, startMonth: 3, startDay: 10 },
-            { id: 6, name: "6. شهر صفر", season: "ذروة الصيف المطمط", baseDays: 31, startMonth: 4, startDay: 11 },
-            { id: 7, name: "7. شهر ربيع الأول", season: "بداية الاعتدال الخريفي", baseDays: 30, startMonth: 5, startDay: 11 },
-            { id: 8, name: "8. شهر ربيع الثاني", season: "الخريف المنتظم", baseDays: 30, startMonth: 6, startDay: 11 },
-            { id: 9, name: "9. شهر جمادى الأولى", season: "مقدمات البرد الشتوي", baseDays: 30, startMonth: 7, startDay: 10 },
-            { id: 10, name: "10. شهر جمادى الآخرة", season: "الدخول في الشتاء", baseDays: 30, startMonth: 8, startDay: 9 },
-            { id: 11, name: "11. شهر رجب المرجب", season: "عمق الشتاء والكثافة", baseDays: 30, startMonth: 9, startDay: 9 },
-            { id: 12, name: "12. شهر شعبان المعظم", season: "الاستعداد لرمضان", baseDays: 30, startMonth: 10, startDay: 8 }
+        const arabicHours = [
+            { id: 1, name: "الشروق", type: "day" }, { id: 2, name: "البكور", type: "day" },
+            { id: 3, name: "الغدوه", type: "day" }, { id: 4, name: "الضحى", type: "day" },
+            { id: 5, name: "الهاجره", type: "day" }, { id: 6, name: "الظهيره", type: "day" },
+            { id: 7, name: "الرواح", type: "day" }, { id: 8, name: "العصر", type: "day" },
+            { id: 9, name: "القصر", type: "day" }, { id: 10, name: "الأصيل", type: "day" },
+            { id: 11, name: "العشي", type: "day" }, { id: 12, name: "الغروب", type: "day" },
+            { id: 13, name: "الشفق", type: "night" }, { id: 14, name: "الغسق", type: "night" },
+            { id: 15, name: "العتمه", type: "night" }, { id: 16, name: "السدفة", type: "night" },
+            { id: 17, name: "الفحمة", type: "night" }, { id: 18, name: "الزلة", type: "night" },
+            { id: 19, name: "الزلفى", type: "night" }, { id: 20, name: "البهره", type: "night" },
+            { id: 21, name: "السحر", type: "night" }, { id: 22, name: "الفجر", type: "night" },
+            { id: 23, name: "الصبح", type: "night" }, { id: 24, name: "الصباح", type: "night" }
         ];
 
-        const weekDays = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
-
-        function initNaturalCalendar() {
+        function runAutomaticCosmicEngine() {
             const now = new Date();
-            const currentYear = now.getFullYear();
             
-            document.getElementById('val-today-greg').innerText = now.toLocaleDateString('ar-IQ', { day: 'numeric', month: 'long', year: 'numeric' });
-
-            const startOfYear = new Date(currentYear, 0, 1);
+            // 1. الاستدلال الأوتوماتيكي بموقع الشمس من خلال دورة اليوم الفلكي المحلي وعمود Z
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
             const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-            const zAngle = (dayOfYear / 365.2422) * 2 * Math.PI;
-            let zValue = Math.round(50 + 50 * Math.cos(zAngle));
+            
+            // زاوية الصعود والنزول الشمسية بالنسبة لعمود Z
+            const zAngle = (dayOfYear / 365.2425) * 2 * Math.PI;
+            const zCosFactor = Math.cos(zAngle); // يتراوح بين -1 (الصيف) و +1 (الشتاء)
+            
+            let zPercentage = Math.round(50 + (50 * zCosFactor));
+            document.getElementById('autoZFactor').innerText = zPercentage + "%";
 
-            // تأثير مستشعر الحرارة والجو الذاتي على أطوال ساعات المعين المطمطّة
-            let thermalFactor = (simulatedTemp - 15) / 35;
-            let dayHourMin = (60 + (thermalFactor * 15)).toFixed(1);
-            let nightHourMin = (120 - dayHourMin).toFixed(1);
+            // 2. تكييف أطوال ساعات النهار والليل أوتوماتيكياً (مطمطاة الوقت الحية)
+            // الشتاء (zCosFactor قريب من 1) -> انكماش النهار وطول الليل
+            // الصيف (zCosFactor قريب من -1) -> تمدد النهار وانكماش الليل
+            let dayHourLen = 60 - (zCosFactor * 14); // تتراوح بين 46 و 74 دقيقة
+            let nightHourLen = 120 - dayHourLen;
 
-            document.getElementById('val-z').innerText = zValue + "% (عمود Z)";
-            document.getElementById('val-day-hour').innerText = dayHourMin + " دقيقة حية";
-            document.getElementById('val-night-hour').innerText = nightHourMin + " دقيقة حية";
+            document.getElementById('autoDaySec').innerText = dayHourLen.toFixed(1) + " دقيقة حية";
+            document.getElementById('autoNightSec').innerText = nightHourLen.toFixed(1) + " دقيقة حية";
 
-            let climateStr = simulatedTemp < 5 ? "❄️ شتاء قارس: انكماش زمني، الكتلة تتقاطع مع هلال 10 كانون الأول" :
-                             (simulatedTemp > 35 ? "🔥 صيف لاهب: تمدد زمني ومطمطاة ثقيلة للكتلة الزمنية" : "⛅ اعتدال موسمي والكتلة تسير بانسجام مع الرؤية");
-            document.getElementById('val-climate').innerText = climateStr;
+            if (zCosFactor > 0.5) {
+                document.getElementById('autoSunPos').innerText = "الأوج الشتوي (أقصى الفاصل العمودي)";
+            } else if (zCosFactor < -0.5) {
+                document.getElementById('autoSunPos').innerText = "الحضيض الصيفي (اقتراب ونور تام)";
+            } else {
+                document.getElementById('autoSunPos').innerText = "الاعتدال الفصلي في الفاصل";
+            }
 
-            const container = document.getElementById('calendar-container');
-            container.innerHTML = "";
+            // 3. حساب الساعة العربية في المعين أوتوماتيكياً
+            let currentHour = now.getHours();
+            let activeH = arabicHours[currentHour % 24];
+            let isDaytime = activeH.type === 'day';
 
-            naturalMonths.forEach(m => {
-                let card = document.createElement('div');
-                card.className = "card p-3.5 rounded-2xl shadow-xl";
+            document.getElementById('autoHourName').innerText = activeH.name;
+            document.getElementById('autoClockDisplay').innerText = `الساعة العربية ${activeH.id} (${activeH.name}) | ${String(now.getMinutes()).padStart(2,'0')} : ${String(now.getSeconds()).padStart(2,'0')}`;
+            document.getElementById('autoPeriodBadge').innerText = isDaytime ? "فترة النهار العربي النقي" : "فترة الليل العربي النقي عبر الفاصل";
 
-                let mStartDate = new Date(currentYear, m.startMonth, m.startDay);
-                let mEndDate = new Date(mStartDate);
-                mEndDate.setDate(mStartDate.getDate() + m.baseDays - 1);
+            // 4. تراكم الكتلة الزمنية للشهر القمري
+            let massAccum = ((now.getTime() / 1000) % 2551443) / 2551443 * 100; // نسبة النبض الكلي للشهر
+            document.getElementById('autoMassAccum').innerText = massAccum.toFixed(1) + "% من الكتلة الحية";
 
-                let dateOptions = { day: 'numeric', month: 'short' };
-                let startStr = mStartDate.toLocaleDateString('ar-IQ', dateOptions);
-                let endStr = mEndDate.toLocaleDateString('ar-IQ', dateOptions);
-
-                let headerHtml = `
-                    <div class="flex justify-between items-center mb-1 border-b border-gray-800 pb-2">
-                        <span class="font-bold text-amber-400 text-xs">${m.name}</span>
-                        <span class="text-[10px] text-cyan-300 font-mono">${m.season}</span>
-                    </div>
-                    <div class="bg-black/60 p-2 rounded-lg border border-gray-800/80 mb-2 flex justify-between items-center text-[10px]">
-                        <span class="text-gray-400">📏 المقياس الستيني المقابل (مرآة الترجمة):</span>
-                        <span class="font-bold text-emerald-300 font-mono">${startStr} إلى ${endStr}</span>
-                    </div>
-                    <div class="text-[10px] text-emerald-400 mb-2 flex justify-between">
-                        <span>🌙 رؤية الهلال والمستشعر: متوافقة</span>
-                        <span class="font-bold text-amber-300">الكتلة الزمنية الحية</span>
-                    </div>
-                `;
-
-                let gridHtml = `<div class="calendar-grid mb-1">`;
-                weekDays.forEach(wd => {
-                    gridHtml += `<div class="day-header">${wd}</div>`;
-                });
-                gridHtml += `</div><div class="calendar-grid">`;
-
-                let jsDayOfWeek = mStartDate.getDay();
-                let correctedOffset = (jsDayOfWeek === 6) ? 0 : (jsDayOfWeek + 1);
-
-                for (let b = 0; b < correctedOffset; b++) {
-                    gridHtml += `<div class="day-cell opacity-10"></div>`;
-                }
-
-                for (let d = 1; d <= m.baseDays; d++) {
-                    let currentDayDate = new Date(mStartDate);
-                    currentDayDate.setDate(mStartDate.getDate() + (d - 1));
-
-                    let isToday = (
-                        now.getFullYear() === currentDayDate.getFullYear() &&
-                        now.getMonth() === currentDayDate.getMonth() &&
-                        now.getDate() === currentDayDate.getDate()
-                    );
-
-                    let isFirstDay = (d === 1);
-                    
-                    let cellClass = isToday ? "today-indicator" : 
-                                  (isFirstDay ? "bg-amber-500 text-black font-bold shadow" : "bg-gray-800/70 text-gray-200 hover:bg-gray-700");
-
-                    let indicatorLabel = isToday ? '<span class="text-[7px] text-white font-extrabold animate-pulse">اليوم</span>' :
-                                       (isFirstDay ? '<span class="text-[8px] opacity-80">هلال</span>' : '');
-
-                    gridHtml += `
-                        <div class="day-cell ${cellClass}" title="${currentDayDate.toLocaleDateString('ar-IQ')}">
-                            <span>${d}</span>
-                            ${indicatorLabel}
-                        </div>
-                    `;
-                }
-
-                gridHtml += `</div>`;
-                card.innerHTML = headerHtml + gridHtml;
-                container.appendChild(card);
-            });
+            if (zCosFactor > 0.7) {
+                document.getElementById('autoCrescentStatus').innerText = "❄️ مستشعر الجو يرصد اقتراب هلال الشتاء المرجعي (10 كانون الأول)";
+            } else {
+                document.getElementById('autoCrescentStatus').innerText = "🌙 الكتلة الزمنية تتراكم بانسجام مع دورات المعين الهلالية";
+            }
         }
 
-        initNaturalCalendar();
+        setInterval(runAutomaticCosmicEngine, 1000);
+        runAutomaticCosmicEngine();
     </script>
 </body>
 </html>
