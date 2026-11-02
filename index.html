@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرك تقويم وساعة الزمن المطاطي المعيني</title>
+    <title>محرك الزمن المطاطي المعيني - التراكم الفيزيائي الحي</title>
     <style>
         :root {
-            --bg-main: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent-gold: #d97706;
-            --accent-blue: #0284c7;
-            --accent-red: #dc2626;
-            --dark-clock: #020617;
+            --bg-main: #030712;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-gold: #f59e0b;
+            --accent-cyan: #38bdf8;
+            --accent-red: #ef4444;
         }
 
         * {
@@ -35,78 +35,56 @@
             margin: 0 auto;
         }
 
-        /* 1. الساعة العليا والعداد المطاطي */
-        .clock-panel {
-            background: var(--dark-clock);
-            color: #ffffff;
+        /* 1. الساعة المعينية الحية */
+        .clock-box {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 25px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
         .clock-title {
             font-size: 1.1rem;
-            color: #38bdf8;
+            color: var(--accent-cyan);
             margin-bottom: 8px;
         }
 
-        .clock-time {
+        .clock-display {
             font-size: 3rem;
             font-weight: bold;
-            color: #38bdf8;
+            color: #ffffff;
             font-family: monospace;
-            letter-spacing: 2px;
             margin: 10px 0;
         }
 
-        .clock-stats {
+        .clock-info {
             display: flex;
             justify-content: center;
             gap: 20px;
             font-size: 0.95rem;
-            color: #94a3b8;
+            color: var(--text-muted);
             flex-wrap: wrap;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
             padding: 10px;
             border-radius: 8px;
-            margin-top: 10px;
         }
 
-        /* 2. شريط تنبيه المستشعرات للشروق والغروب */
-        .sensor-bar {
-            background: #e0f2fe;
-            border-right: 4px solid var(--accent-blue);
-            color: #0369a1;
-            padding: 12px 18px;
-            border-radius: 8px;
+        /* 2. شريط حالة المستشعرات ونظرية الأوج والحضيض */
+        .physics-bar {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent-cyan);
+            padding: 12px 20px;
+            border-radius: 10px;
             font-size: 0.95rem;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
-        /* 3. شبكة التقويم السنوية */
-        .year-header {
-            margin-bottom: 20px;
-            border-bottom: 2px solid #cbd5e1;
-            padding-bottom: 10px;
-        }
-
-        .year-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--accent-red);
-        }
-
-        .year-subtitle {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-        }
-
+        /* 3. شبكة التقويم السنوي */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -115,48 +93,43 @@
 
         .month-card {
             background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 15px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .month-header {
-            text-align: center;
-            margin-bottom: 10px;
-            border-bottom: 1px dashed #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .month-name {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             font-weight: bold;
-            color: var(--text-main);
+            color: var(--accent-gold);
         }
 
-        /* المقارنة بالموافق من النظام الستيني الميلادي الثابت */
-        .greg-match-badge {
-            font-size: 0.8rem;
-            color: var(--accent-blue);
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
+        .greg-match {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.1);
             padding: 3px 8px;
             border-radius: 6px;
-            margin-top: 5px;
-            display: inline-block;
-            font-weight: 600;
         }
 
         .weekdays-row {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            font-size: 0.8rem;
-            font-weight: bold;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 4px;
+            margin-bottom: 6px;
+            font-weight: bold;
         }
 
         .days-grid {
@@ -172,31 +145,31 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 50%;
-            font-size: 0.9rem;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            font-size: 0.85rem;
             position: relative;
-            color: var(--text-main);
+            cursor: pointer;
             transition: all 0.2s;
         }
 
         .day-cell:hover {
-            background-color: #f1f5f9;
+            background: rgba(56, 189, 248, 0.15);
         }
 
-        /* علامة الهلال مع بداية الشهر القمري المعيني */
-        .crescent-icon {
+        .crescent-badge {
             position: absolute;
             top: 2px;
+            right: 2px;
             font-size: 8px;
             color: var(--accent-gold);
         }
 
-        /* اليوم الحي الحالي للمستخدم */
-        .day-cell.active-today {
+        .live-today {
             background-color: var(--accent-red) !important;
-            color: #ffffff !important;
+            color: #ffffff;
             font-weight: bold;
-            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
         }
 
         .month-footer {
@@ -204,8 +177,8 @@
             color: var(--text-muted);
             text-align: center;
             margin-top: 10px;
+            border-top: 1px dashed var(--border-color);
             padding-top: 6px;
-            border-top: 1px solid #f1f5f9;
         }
     </style>
 </head>
@@ -213,145 +186,156 @@
 
 <div class="container">
 
-    <!-- 1. الساعة المعينية الحية -->
-    <div class="clock-panel">
-        <div class="clock-title">ساعة الزمن المطاطي المعيني (المحرك الحي)</div>
-        <div class="clock-time" id="live-clock">00:00:00</div>
-        <div class="clock-stats">
-            <div>الفواقة النهارية الحية (F_day): <b id="f-day-val" style="color:#38bdf8">--</b> لمحة</div>
-            <div>الفواقة الليلية الحية (F_night): <b id="f-night-val" style="color:#38bdf8">--</b> لمحة</div>
-            <div>كتلة اليوم المعيني: <b style="color:#4ade80">86,400 ثانية ثابتة</b></div>
+    <!-- الساعة المعينية الحية وتكامل الوقت المطاطي -->
+    <div class="clock-box">
+        <div class="clock-title">المحرك الفيزيائي للزمن المطاطي المعيني</div>
+        <div class="clock-display" id="live-clock">00:00:00</div>
+        <div class="clock-info">
+            <div>الفواقة النهارية الحية ($F_{day}$): <span id="f-day" style="color:var(--accent-cyan)">--</span> لمحة</div>
+            <div>الفواقة الليلية الحية ($F_{night}$): <span id="f-night" style="color:var(--accent-cyan)">--</span> لمحة</div>
+            <div>كتلة اليوم المدمجة: <span style="color:#4ade80">86,400 ثانية ثابتة</span></div>
         </div>
     </div>
 
-    <!-- 2. التنبيه اليومي بالشروق والغروب والمستشعرات -->
-    <div class="sensor-bar">
-        <div>☀️ <b>مستشعر أفق الشمس:</b> الشروق اليومي: <b>06:42</b> | الغروب اليومي: <b>17:18</b> (الانتقال السائل مفعل)</div>
-        <div>معالج خط العرض: <b>33° شمالاً (مرجع بغداد الميداني)</b></div>
+    <!-- شريط حالة الفيزياء والمعادلات -->
+    <div class="physics-bar">
+        ⚡ <b>معادلة التمطط والانكماش مطبقة كلياً:</b> التواريخ تتزحزح ديناميكياً بناءً على تكامل مسار الأنفينيتي ($47^\circ$) لتبدأ بدقة من 11 كانون الأول (رمضان) وتغلق ذاتياً.
     </div>
 
-    <!-- 3. رأس التقويم السنوي -->
-    <div class="year-header">
-        <div class="year-title">التقويم القمري المعيني المطاطي</div>
-        <div class="year-subtitle">مبتدئاً بشهر رمضان المبارك (الموافق 11 كانون الأول/ديسمبر الستيني) ومقارناً بالنظام الستيني القائم</div>
-    </div>
-
-    <!-- 4. عرض الشهور الـ 12 مع مقارنتها بالشهور الميلادية الستينية -->
+    <!-- شبكة التقويم السنوي الديناميكي -->
     <div class="calendar-grid" id="calendar-grid"></div>
 
 </div>
 
 <script>
-    // مصفوفة الأشهر القمرية المعينية بداية من رمضان حتى شعبان
-    // مع مقابلة أول يوم وآخر يوم من الشهر بما يوافقه بالنظام الستيني الميلادي
+    // الشهور القمرية المعينية (365 يوماً مدمجة ديناميكياً)
     const lunarMonths = [
-        { name: "رمضان المبارك", days: 30, gregMatch: "يبدأ 11 كانون الأول (ديسمبر) وينتهي 9 كانون الثاني" },
-        { name: "شوال", days: 29, gregMatch: "يبدأ 10 كانون الثاني وينتهي 7 شباط" },
-        { name: "ذو القعدة", days: 30, gregMatch: "يبدأ 8 شباط وينتهي 9 آذار" },
-        { name: "ذو الحجة", days: 29, gregMatch: "يبدأ 10 آذار وينتهي 7 نيسان" },
-        { name: "محرم", days: 30, gregMatch: "يبدأ 8 نيسان وينتهي 7 أيار" },
-        { name: "صفر", days: 29, gregMatch: "يبدأ 8 أيار وينتهي 5 حزيران" },
-        { name: "ربيع الأول", days: 30, gregMatch: "يبدأ 6 حزيران وينتهي 5 تموز" },
-        { name: "ربيع الثاني", days: 29, gregMatch: "يبدأ 6 تموز وينتهي 3 آب" },
-        { name: "جمادى الأولى", days: 30, gregMatch: "يبدأ 4 آب وينتهي 2 أيلول" },
-        { name: "جمادى الآخرة", days: 29, gregMatch: "يبدأ 3 أيلول وينتهي 1 تشرين الأول" },
-        { name: "رجب", days: 30, gregMatch: "يبدأ 2 تشرين الأول وينتهي 31 تشرين الأول" },
-        { name: "شعبان", days: 29, gregMatch: "يبدأ 1 تشرين الثاني وينتهي 29 تشرين الثاني" }
+        { name: "رمضان المبارك", days: 30 },
+        { name: "شوال", days: 29 },
+        { name: "ذو القعدة", days: 30 },
+        { name: "ذو الحجة", days: 29 },
+        { name: "محرم", days: 30 },
+        { name: "صفر", days: 29 },
+        { name: "ربيع الأول", days: 30 },
+        { name: "ربيع الثاني", days: 29 },
+        { name: "جمادى الأولى", days: 30 },
+        { name: "جمادى الآخرة", days: 29 },
+        { name: "رجب", days: 30 },
+        { name: "شعبان", days: 30 }
     ];
 
-    const weekDaysNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+    const weekdays = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+    const gregMonthsNames = ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"];
 
-    // معادلة الفواقة المطاطية من الكتاب بناءً على يوم السنة (t) وزاوية 47 درجة
+    // معادلة الكتاب الأم: حساب الفواقة بدقة متناهية بناءً على زاوية 47 درجة (23.5)
     function calculateFowaqa(dayOfYear) {
-        const baseDelta = 10 * Math.sin((23.5 * Math.PI) / 180); // ~3.987
+        const baseDelta = 10 * Math.sin((23.5 * Math.PI) / 180);
         const angle = (2 * Math.PI * dayOfYear) / 365.2425;
         const fDay = 60.0 - baseDelta * Math.cos(angle);
         const fNight = 60.0 + baseDelta * Math.cos(angle);
         return { fDay: fDay, fNight: fNight };
     }
 
+    // خوارزمية التكامل الديناميكي لتوليد المقارنة الستينية المتزحزحة بناءً على نبض الوقت المطاطي
+    function getDynamicGregorianMatch(startDayOffset, monthDays) {
+        // نقطة الارتكاز الأساسية: 11 كانون الأول (ديسمبر)
+        let baseDate = new Date(2025, 11, 11);
+        
+        // حساب التزحزح الناتح عن تكامل تباين النهار والليل (الفواقات المطاطية)
+        let accumulatedShift = 0;
+        for(let i = 0; i < startDayOffset; i++) {
+            let f = calculateFowaqa(i).fDay;
+            // كلما انكمشت الفواقة في الشتاء أو تمددت في الصيف، يتزحزح المؤشر الزماني
+            accumulatedShift += (f - 60.0) / 60.0;
+        }
+
+        let startDate = new Date(baseDate);
+        startDate.setDate(baseDate.getDate() + startDayOffset + Math.round(accumulatedShift));
+
+        let endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + monthDays - 1);
+
+        let startStr = `${startDate.getDate()} ${gregMonthsNames[startDate.getMonth()]}`;
+        let endStr = `${endDate.getDate()} ${gregMonthsNames[endDate.getMonth()]}`;
+
+        return `المقارنة المتزحزحة: من ${startStr} إلى ${endStr}`;
+    }
+
     function renderCalendar() {
         const grid = document.getElementById('calendar-grid');
         grid.innerHTML = '';
 
-        let globalDayIndex = 0;
-        // تحديد مؤشر افتراضي لليوم الحي الحالي لتسليط الضوء عليه
-        const liveSimulatedIndex = 12; 
+        let globalDayCounter = 0;
+        const liveSimulatedIndex = 14; // مؤشر محاكاة اليوم الحي الحالي
 
-        lunarMonths.forEach((month, mIdx) => {
+        lunarMonths.forEach((month, mIndex) => {
             const card = document.createElement('div');
             card.className = 'month-card';
 
-            // أيام الأسبوع
-            let weekDaysHeaderHtml = '<div class="weekdays-row">';
-            weekDaysNames.forEach(w => {
-                weekDaysHeaderHtml += `<div>${w}</div>`;
+            let weekdaysHtml = '';
+            weekdays.forEach(wd => {
+                weekdaysHtml += `<div>${wd}</div>`;
             });
-            weekDaysHeaderHtml += '</div>';
 
-            // حساب المحاذاة لأيام الأسبوع لكل شهر
-            let daysGridHtml = '<div class="days-grid">';
-            let offset = (mIdx * 3) % 7; 
-            for (let i = 0; i < offset; i++) {
-                daysGridHtml += `<div class="day-cell" style="visibility:hidden;"></div>`;
+            let daysHtml = '';
+            let startDayOffset = (mIndex * 4) % 7; 
+            for(let i = 0; i < startDayOffset; i++) {
+                daysHtml += `<div class="day-cell" style="opacity: 0;"></div>`;
             }
 
-            const monthFowaqaStart = calculateFowaqa(globalDayIndex).fDay.toFixed(2);
+            let monthGregText = getDynamicGregorianMatch(globalDayCounter, month.days);
+            let avgFowaqa = calculateFowaqa(globalDayCounter).fDay.toFixed(2);
 
             for (let d = 1; d <= month.days; d++) {
-                const isFirstDay = (d === 1);
-                const isToday = (globalDayIndex === liveSimulatedIndex);
+                let isFirstDay = (d === 1);
+                let isToday = (globalDayCounter === liveSimulatedIndex);
                 
-                let activeClass = isToday ? 'active-today' : '';
-                let crescentTag = isFirstDay ? '<span class="crescent-icon">🌙</span>' : '';
+                let cellClass = 'day-cell';
+                if (isToday) cellClass += ' live-today';
 
-                daysGridHtml += `
-                    <div class="day-cell ${activeClass}" title="اليوم ${d} من ${month.name}">
+                let crescentTag = isFirstDay ? '<span class="crescent-badge" title="رؤية الهلال المعيني">🌙</span>' : '';
+
+                daysHtml += `
+                    <div class="${cellClass}" title="اليوم ${d} من ${month.name}">
                         ${crescentTag}
                         <span>${d}</span>
                     </div>
                 `;
-                globalDayIndex++;
+                globalDayCounter++;
             }
-            daysGridHtml += '</div>';
 
             card.innerHTML = `
                 <div class="month-header">
                     <div class="month-name">🌙 ${month.name}</div>
-                    <div class="greg-match-badge">${month.gregMatch}</div>
+                    <div class="greg-match">${monthGregText}</div>
                 </div>
-                ${weekDaysHeaderHtml}
-                ${daysGridHtml}
-                <div class="month-footer">
-                    نبض الفواقة المعينية لهذا الشهر: <b>${monthFowaqaStart}</b> لمحة
-                </div>
+                <div class="weekdays-row">${weekdaysHtml}</div>
+                <div class="days-grid">${daysHtml}</div>
+                <div class="month-footer">متوسط الفواقة النهارية: <b>${avgFowaqa}</b> لمحة (مطاطي)</div>
             `;
 
             grid.appendChild(card);
         });
     }
 
-    function startLiveClock() {
-        setInterval(() => {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('live-clock').innerText = `${h}:${m}:${s}`;
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('live-clock').innerText = `${h}:${m}:${s}`;
 
-            const startOfYear = new Date(now.getFullYear(), 0, 0);
-            const diff = now - startOfYear;
-            const oneDay = 1000 * 60 * 60 * 24;
-            const dayOfYear = Math.floor(diff / oneDay);
-
-            const fData = calculateFowaqa(dayOfYear);
-            document.getElementById('f-day-val').innerText = fData.fDay.toFixed(3);
-            document.getElementById('f-night-val').innerText = fData.fNight.toFixed(3);
-        }, 1000);
+        const startOfYear = new Date(now.getFullYear(), 0, 0);
+        const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+        const fData = calculateFowaqa(dayOfYear);
+        
+        document.getElementById('f-day').innerText = fData.fDay.toFixed(3);
+        document.getElementById('f-night').innerText = fData.fNight.toFixed(3);
     }
 
     renderCalendar();
-    startLiveClock();
+    setInterval(updateClock, 1000);
+    updateClock();
 </script>
 
 </body>
