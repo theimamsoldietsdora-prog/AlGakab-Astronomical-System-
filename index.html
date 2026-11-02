@@ -1,342 +1,201 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرك الزمن المطاطي المعيني - التراكم الفيزيائي الحي</title>
-    <style>
-        :root {
-            --bg-main: #030712;
-            --card-bg: #111827;
-            --border-color: #1f2937;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --accent-gold: #f59e0b;
-            --accent-cyan: #38bdf8;
-            --accent-red: #ef4444;
-        }
+import math
+from datetime import datetime, timedelta
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+# ==============================================================================
+# 1. الثوابت الأساسية وهيكل التقويم المعيني (System Constants & Calendar Structure)
+# ==============================================================================
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            padding: 20px;
-            direction: rtl;
-        }
+# معامل التمدد المعيني الثابت
+C_M = 0.03105
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+# مرجع انطلاق التقويم المعيني (11 ديسمبر - أول شهر رمضان المعيني)
+ANCHOR_MONTH = 12
+ANCHOR_DAY = 11
 
-        /* 1. الساعة المعينية الحية */
-        .clock-box {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 25px;
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
+# أسماء الأشهر المعينية بالترتيب
+MEEANI_MONTH_NAMES = [
+    "1. رمضان المبارك",
+    "2. شوال",
+    "3. ذو القعدة",
+    "4. ذو الحجة",
+    "5. محرم",
+    "6. صفر",
+    "7. ربيع الأول (القمة)",
+    "8. ربيع الثاني",
+    "9. جمادى الأولى",
+    "10. جمادى الآخرة",
+    "11. رجب",
+    "12. شعبان"
+]
 
-        .clock-title {
-            font-size: 1.1rem;
-            color: var(--accent-cyan);
-            margin-bottom: 8px;
-        }
+# نمط الساعات المضافة للأشهر (أيام الأساس = 29 ما عدا الشهر 7 = 30)
+HOURLY_PATTERN = [0, 1, 2, 10, 15, 21, 0, 23, 21, 16, 12, 6]
 
-        .clock-display {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #ffffff;
-            font-family: monospace;
-            margin: 10px 0;
-        }
+# ==============================================================================
+# 2. محرك حساب التقويم المعيني المطاط (Me'eeni Calendar Engine)
+# ==============================================================================
 
-        .clock-info {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            flex-wrap: wrap;
-            background: rgba(255,255,255,0.03);
-            padding: 10px;
-            border-radius: 8px;
-        }
+def get_meeani_calendar_structure():
+    """
+    يقوم بحساب الهيكل الكامل للأشهر الـ 12 بالقيم الأساسية
+    ونسب الزيادة المعينية 0.03105 والقيم الكلية النهائية بالأيام.
+    """
+    calendar_data = []
+    total_year_days = 0.0
 
-        /* 2. شريط حالة المستشعرات ونظرية الأوج والحضيض */
-        .physics-bar {
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: var(--accent-cyan);
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        /* 3. شبكة التقويم السنوي */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .month-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .month-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-        }
-
-        .month-name {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--accent-gold);
-        }
-
-        .greg-match {
-            font-size: 0.75rem;
-            color: var(--accent-cyan);
-            background: rgba(56, 189, 248, 0.1);
-            padding: 3px 8px;
-            border-radius: 6px;
-        }
-
-        .weekdays-row {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-        }
-
-        .day-cell {
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255,255,255,0.02);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .day-cell:hover {
-            background: rgba(56, 189, 248, 0.15);
-        }
-
-        .crescent-badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            font-size: 8px;
-            color: var(--accent-gold);
-        }
-
-        .live-today {
-            background-color: var(--accent-red) !important;
-            color: #ffffff;
-            font-weight: bold;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
-        }
-
-        .month-footer {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 10px;
-            border-top: 1px dashed var(--border-color);
-            padding-top: 6px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-
-    <!-- الساعة المعينية الحية وتكامل الوقت المطاطي -->
-    <div class="clock-box">
-        <div class="clock-title">المحرك الفيزيائي للزمن المطاطي المعيني</div>
-        <div class="clock-display" id="live-clock">00:00:00</div>
-        <div class="clock-info">
-            <div>الفواقة النهارية الحية ($F_{day}$): <span id="f-day" style="color:var(--accent-cyan)">--</span> لمحة</div>
-            <div>الفواقة الليلية الحية ($F_{night}$): <span id="f-night" style="color:var(--accent-cyan)">--</span> لمحة</div>
-            <div>كتلة اليوم المدمجة: <span style="color:#4ade80">86,400 ثانية ثابتة</span></div>
-        </div>
-    </div>
-
-    <!-- شريط حالة الفيزياء والمعادلات -->
-    <div class="physics-bar">
-        ⚡ <b>معادلة التمطط والانكماش مطبقة كلياً:</b> التواريخ تتزحزح ديناميكياً بناءً على تكامل مسار الأنفينيتي ($47^\circ$) لتبدأ بدقة من 11 كانون الأول (رمضان) وتغلق ذاتياً.
-    </div>
-
-    <!-- شبكة التقويم السنوي الديناميكي -->
-    <div class="calendar-grid" id="calendar-grid"></div>
-
-</div>
-
-<script>
-    // الشهور القمرية المعينية (365 يوماً مدمجة ديناميكياً)
-    const lunarMonths = [
-        { name: "رمضان المبارك", days: 30 },
-        { name: "شوال", days: 29 },
-        { name: "ذو القعدة", days: 30 },
-        { name: "ذو الحجة", days: 29 },
-        { name: "محرم", days: 30 },
-        { name: "صفر", days: 29 },
-        { name: "ربيع الأول", days: 30 },
-        { name: "ربيع الثاني", days: 29 },
-        { name: "جمادى الأولى", days: 30 },
-        { name: "جمادى الآخرة", days: 29 },
-        { name: "رجب", days: 30 },
-        { name: "شعبان", days: 30 }
-    ];
-
-    const weekdays = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
-    const gregMonthsNames = ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"];
-
-    // معادلة الكتاب الأم: حساب الفواقة بدقة متناهية بناءً على زاوية 47 درجة (23.5)
-    function calculateFowaqa(dayOfYear) {
-        const baseDelta = 10 * Math.sin((23.5 * Math.PI) / 180);
-        const angle = (2 * Math.PI * dayOfYear) / 365.2425;
-        const fDay = 60.0 - baseDelta * Math.cos(angle);
-        const fNight = 60.0 + baseDelta * Math.cos(angle);
-        return { fDay: fDay, fNight: fNight };
-    }
-
-    // خوارزمية التكامل الديناميكي لتوليد المقارنة الستينية المتزحزحة بناءً على نبض الوقت المطاطي
-    function getDynamicGregorianMatch(startDayOffset, monthDays) {
-        // نقطة الارتكاز الأساسية: 11 كانون الأول (ديسمبر)
-        let baseDate = new Date(2025, 11, 11);
+    for i in range(12):
+        base_days = 30.0 if i == 6 else 29.0  # ربيع الأول هو القمة (30 يوم)
+        added_hours = HOURLY_PATTERN[i]
         
-        // حساب التزحزح الناتح عن تكامل تباين النهار والليل (الفواقات المطاطية)
-        let accumulatedShift = 0;
-        for(let i = 0; i < startDayOffset; i++) {
-            let f = calculateFowaqa(i).fDay;
-            // كلما انكمشت الفواقة في الشتاء أو تمددت في الصيف، يتزحزح المؤشر الزماني
-            accumulatedShift += (f - 60.0) / 60.0;
-        }
-
-        let startDate = new Date(baseDate);
-        startDate.setDate(baseDate.getDate() + startDayOffset + Math.round(accumulatedShift));
-
-        let endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + monthDays - 1);
-
-        let startStr = `${startDate.getDate()} ${gregMonthsNames[startDate.getMonth()]}`;
-        let endStr = `${endDate.getDate()} ${gregMonthsNames[endDate.getMonth()]}`;
-
-        return `المقارنة المتزحزحة: من ${startStr} إلى ${endStr}`;
-    }
-
-    function renderCalendar() {
-        const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = '';
-
-        let globalDayCounter = 0;
-        const liveSimulatedIndex = 14; // مؤشر محاكاة اليوم الحي الحالي
-
-        lunarMonths.forEach((month, mIndex) => {
-            const card = document.createElement('div');
-            card.className = 'month-card';
-
-            let weekdaysHtml = '';
-            weekdays.forEach(wd => {
-                weekdaysHtml += `<div>${wd}</div>`;
-            });
-
-            let daysHtml = '';
-            let startDayOffset = (mIndex * 4) % 7; 
-            for(let i = 0; i < startDayOffset; i++) {
-                daysHtml += `<div class="day-cell" style="opacity: 0;"></div>`;
-            }
-
-            let monthGregText = getDynamicGregorianMatch(globalDayCounter, month.days);
-            let avgFowaqa = calculateFowaqa(globalDayCounter).fDay.toFixed(2);
-
-            for (let d = 1; d <= month.days; d++) {
-                let isFirstDay = (d === 1);
-                let isToday = (globalDayCounter === liveSimulatedIndex);
-                
-                let cellClass = 'day-cell';
-                if (isToday) cellClass += ' live-today';
-
-                let crescentTag = isFirstDay ? '<span class="crescent-badge" title="رؤية الهلال المعيني">🌙</span>' : '';
-
-                daysHtml += `
-                    <div class="${cellClass}" title="اليوم ${d} من ${month.name}">
-                        ${crescentTag}
-                        <span>${d}</span>
-                    </div>
-                `;
-                globalDayCounter++;
-            }
-
-            card.innerHTML = `
-                <div class="month-header">
-                    <div class="month-name">🌙 ${month.name}</div>
-                    <div class="greg-match">${monthGregText}</div>
-                </div>
-                <div class="weekdays-row">${weekdaysHtml}</div>
-                <div class="days-grid">${daysHtml}</div>
-                <div class="month-footer">متوسط الفواقة النهارية: <b>${avgFowaqa}</b> لمحة (مطاطي)</div>
-            `;
-
-            grid.appendChild(card);
-        });
-    }
-
-    function updateClock() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('live-clock').innerText = `${h}:${m}:${s}`;
-
-        const startOfYear = new Date(now.getFullYear(), 0, 0);
-        const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-        const fData = calculateFowaqa(dayOfYear);
+        # القيمة بالأيام الستينية قبل الضرب
+        raw_days = base_days + (added_hours / 24.0)
         
-        document.getElementById('f-day').innerText = fData.fDay.toFixed(3);
-        document.getElementById('f-night').innerText = fData.fNight.toFixed(3);
+        # الزيادة المعينية بضرب النسبة الثابتة 0.03105
+        meeani_addition = raw_days * C_M
+        
+        # القيمة الكلية النهائية للشهر المطاطي
+        final_elastic_days = raw_days + meeani_addition
+        total_year_days += final_elastic_days
+        
+        calendar_data.append({
+            "month_num": i + 1,
+            "name": MEEANI_MONTH_NAMES[i],
+            "base_days": base_days,
+            "added_hours": added_hours,
+            "raw_days": raw_days,
+            "addition": meeani_addition,
+            "final_days": final_elastic_days
+        })
+        
+    return calendar_data, total_year_days
+
+# ==============================================================================
+# 3. التزامن الفلكي التلقائي ومؤشر اليوم الحالي (Automatic Anchor & Live Tracking)
+# ==============================================================================
+
+def locate_current_meeani_day(current_datetime, calendar_structure):
+    """
+    يبحث أوتوماتيكياً عن التاريخ الفعلي الحالي مقارنة بنقطة الارتكاز (11/12)
+    ويحدد في أي شهر ويوم معيني تقع الآن بدقة مطاطية.
+    """
+    # تحديد بداية السنة المعينية الحالية من 11 ديسمبر الماضي
+    year = current_datetime.year
+    anchor_date = datetime(year, ANCHOR_MONTH, ANCHOR_DAY)
+    
+    # إذا كان التاريخ الحالي قبل 11 ديسمبر، فنحن في سنة معينية بدأت 11 ديسمبر العام الماضي
+    if current_datetime < anchor_date:
+        anchor_date = datetime(year - 1, ANCHOR_MONTH, ANCHOR_DAY)
+        
+    # عدد الأيام الفردية المنقضية منذ 11/12
+    days_passed = (current_datetime - anchor_date).total_seconds() / 86400.0
+    
+    accumulated_days = 0.0
+    current_month_info = None
+    day_in_month = 0
+    
+    for month in calendar_structure:
+        month_length = month["final_days"]
+        if accumulated_days <= days_passed < (accumulated_days + month_length):
+            current_month_info = month
+            day_in_month = int(days_passed - accumulated_days) + 1
+            break
+        accumulated_days += month_length
+        
+    # في حال تجاوزت السنة
+    if not current_month_info:
+        current_month_info = calendar_structure[-1]
+        day_in_month = int(calendar_structure[-1]["final_days"])
+
+    return anchor_date, current_month_info, day_in_month, days_passed
+
+# ==============================================================================
+# 4. محرك الساعة المطاطية المتزامنة مع الشروق (Sunrise-Anchored Elastic Clock)
+# ==============================================================================
+
+def calculate_elastic_clock(current_datetime, sunrise_time_str="06:30:00"):
+    """
+    يزامن أول ساعة في النهار مع لحظة شروق الشمس تماماً لليوم الحالي (بداية صفر الوقت)
+    ويقوم بمط الوقت وحساب الساعة والدقيقة المعينية المطاطية.
+    """
+    # تحويل وقت الشروق إلى كائن datetime لليوم الحالي
+    sunrise_time = datetime.strptime(
+        f"{current_datetime.strftime('%Y-%m-%d')} {sunrise_time_str}", 
+        "%Y-%m-%d %H:%M:%S"
+    )
+    
+    # إذا كان الوقت الحالي قبل الشروق، نأخذ شروق اليوم السابق كمرجع
+    if current_datetime < sunrise_time:
+        sunrise_time -= timedelta(days=1)
+        
+    # الثواني الستينية المنقضية منذ الشروق
+    elapsed_seconds = (current_datetime - sunrise_time).total_seconds()
+    elapsed_minutes = elapsed_seconds / 60.0
+    
+    # تحويل الدقائق الستينية إلى دقائق معينية مطاطية بواسطة النسبة الثابتة 0.03105
+    elastic_minutes_passed = elapsed_minutes * (1 + C_M)
+    
+    # حساب الساعات والدقائق والثواني المطاطية (تعتمد 60 دقيقة مطاطية للساعة)
+    elastic_hours = int(elastic_minutes_passed // 60)
+    remaining_elastic_minutes = int(elastic_minutes_passed % 60)
+    elastic_seconds = int((elastic_minutes_passed * 60) % 60)
+    
+    return {
+        "sunrise_anchor": sunrise_time.strftime("%H:%M:%S"),
+        "elapsed_standard_mins": elapsed_minutes,
+        "elastic_hours": elastic_hours,
+        "elastic_minutes": remaining_elastic_minutes,
+        "elastic_seconds": elastic_seconds
     }
 
-    renderCalendar();
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
+# ==============================================================================
+# 5. عرض الهيكل بالكامل واجهة التقويم والساعة (Full Display Interface)
+# ==============================================================================
 
-</body>
-</html>
+def display_full_meeani_system():
+    # 1. بناء هيكل التقويم
+    calendar_structure, total_year_days = get_meeani_calendar_structure()
+    
+    # 2. الحصول على التاريخ الحالي وتحديد المؤشر الأوتوماتيكي
+    now = datetime.now()
+    anchor_date, current_month, day_in_month, days_passed = locate_current_meeani_day(now, calendar_structure)
+    
+    # 3. حساب الساعة المطاطية المزامنة مع الشروق (افتراض شروق بغداد اليوم 06:15 ص)
+    clock_info = calculate_elastic_clock(now, sunrise_time_str="06:15:00")
+
+    print("=" * 80)
+    print("                    نظام التقويم والساعة المطاطية المعينية")
+    print("=" * 80)
+    print(f"النسبة المعينية الثابتة (C_m): {C_M}")
+    print(f"مرجع التقويم (بداية 1 رمضان): {anchor_date.strftime('%Y-%m-%d')} (11 ديسمبر)")
+    print(f"تاريخ النظام الحالي: {now.strftime('%Y-%m-%d %H:%M:%S')}")
+    print("-" * 80)
+    
+    # عرض الساعة المطاطية أعلاه
+    print(" [ الساعة المعينية المطاطية الآن (بداية التوقيت من الشروق) ]")
+    print(f" • نقطة بداية نهار اليوم (شروق الشمس): {clock_info['sunrise_anchor']}")
+    print(f" • الوقت المطاط الآن: {clock_info['elastic_hours']:02d}:{clock_info['elastic_minutes']:02d}:{clock_info['elastic_seconds']:02d} (ساعة مطاطية)")
+    print("-" * 80)
+    
+    # عرض الجدول الكامل للأشهر
+    print(" [ هيكل التقويم المعيني للسنة الكاملة ]")
+    print(f"{'#':<3} | {'اسم الشهر المعيني':<22} | {'الأساس (أيام+س)':<15} | {'الزيادة (0.03105)':<15} | {'إجمالي أيام الشهر المطاطية':<20}")
+    print("-" * 80)
+    
+    for m in calendar_structure:
+        base_fmt = f"{int(m['base_days'])}d + {m['added_hours']}h"
+        print(f"{m['month_num']:<3} | {m['name']:<22} | {base_fmt:<15} | +{m['addition']:<14.5f} | {m['final_days']:<20.5f}")
+        
+    print("-" * 80)
+    print(f" المجموع الإجمالي للسنة المعينية المطاطية: {total_year_days:.5f} يوماً")
+    print("=" * 80)
+    
+    # عرض مؤشر اليوم الحالي الأوتوماتيكي
+    print(" [ مؤشر موقعك الفعلي الآن في التقويم المعيني (أوتوماتيكي) ]")
+    print(f" • أنت اليوم في: {current_month['name']}")
+    print(f" • اليوم المعيني: {day_in_month} من أصل {current_month['final_days']:.2f} يوماً مطاطياً")
+    print(f" • الأيام الكلية المنقضية منذ 11/12: {days_passed:.2f} يوماً")
+    print("=" * 80)
+
+# تشغيل النظام بالكامل
+if __name__ == "__main__":
+    display_full_meeani_system()
