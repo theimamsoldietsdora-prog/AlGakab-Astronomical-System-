@@ -1,131 +1,154 @@
-import math
-from datetime import datetime, timedelta
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرك الزمن المطاطي المعيني - التقويم القمري الحي</title>
+    <style>
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #38bdf8;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .month-box {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-right: 4px solid #38bdf8;
+        }
+        .month-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: center;
+            border-bottom: 1px solid #374151;
+        }
+        th {
+            background: #111827;
+            color: #94a3b8;
+        }
+        tr.today-row {
+            background-color: #0369a1 !important;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .badge {
+            background: #f59e0b;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
 
-class MeeeniCalendarEngine:
-    def __init__(self, current_date=None, latitude_deg=33.0):
-        """
-        محرك التقويم والزمن المطاطي المعيني الشامل (Me'eeni Unified Engine)
-        المرجع الأساسي: 10 كانون الأول (ديسمبر) كبداية للسنة المعينية.
-        """
-        self.latitude_deg = latitude_deg
-        self.days_in_year = 365.2425
-        
-        # تحديد التاريخ الحالي (افتراضياً اليوم الحقيقي أو تاريخ محاذاة)
-        self.current_real_date = current_date if current_date else datetime.now()
-        
-    def get_seasonal_amplitude(self):
-        """معالج المعايرة الجغرافية وخطوط العرض (Geographic Calibration Processor)"""
-        base_delta = 10 * math.sin(math.radians(23.5))
-        lat_factor = math.sin(math.radians(self.latitude_deg)) / math.sin(math.radians(33.0))
-        return base_delta * lat_factor
+<div class="container">
+    <h1>نظـام الزّمـن المطاطـي المعينـي</h1>
+    <p class="subtitle">التقويم القمري الحي (مبتدئاً برمضان ومنتهياً بشعبان) مع تطبيق فيزياء الأوج والحضيض (47°)</p>
+    
+    <div id="calendar-container">
+        <!-- سيتم توليد التقويم هنا برمجياً -->
+    </div>
+</div>
 
-    def calculate_fowaqa(self, day_of_year):
-        """حساب الفواقة النهارية والليلية لليوم (t) ضمن مسار الأنفينيتي"""
-        delta = self.get_seasonal_amplitude()
-        angle = (2 * math.pi * day_of_year) / self.days_in_year
-        
-        # الفواقة النهارية (تنكمش في الأوج شتاءً بـ 47 درجة، وتتمدد في الحضيض صيفاً)
-        f_day = 60.0 - delta * math.cos(angle)
-        # الفواقة الليلية المتعاكسة لضمان بقاء كتلة اليوم 24 ساعة تامة
-        f_night = 60.0 + delta * math.cos(angle)
-        
-        return f_day, f_night
+<script>
+    // هيكل الأشهر القمرية المعينية (يبدأ برمضان وينتهي بشعبان)
+    const lunarMonths = [
+        { name: "رمضان المبارك", days: 30 },
+        { name: "شوال", days: 29 },
+        { name: "ذو القعدة", days: 30 },
+        { name: "ذو الحجة", days: 29 },
+        { name: "محرم", days: 30 },
+        { name: "صفر", days: 29 },
+        { name: "ربيع الأول", days: 30 },
+        { name: "ربيع الثاني", days: 29 },
+        { name: "جمادى الأولى", days: 30 },
+        { name: "جمادى الآخرة", days: 29 },
+        { name: "رجب", days: 30 },
+        { name: "شعبان", days: 29 }
+    ];
 
-    def generate_meeeni_calendar(self):
-        """
-        توليد تقويم السنة المعينية بالكامل ابتداءً من 10 كانون الأول (ديسمبر)
-        مع أسماء الأشهر المعينية، عدد الأيام (29 أو 30 للقمر)، ومؤشر اليوم الحي.
-        """
-        # بناء أشهر السنة المعينية الـ 12 متوافقة مع الدورة القمرية وحركة المحور Z
-        # إجمالي الأيام = 365 يوماً (موزعة على 12 شهراً تتراوح بين 29 و 30 يوماً)
-        months_structure = [
-            ("كانون الأول (شهر التأسيس والأوج)", 30),
-            ("كانون الثاني", 30),
-            ("شباط", 29),
-            ("آذار (الاعتدال الربيعي)", 30),
-            ("نيسان", 29),
-            ("أيار", 30),
-            ("حزيران (الحضيض والتعامد الصيفي)", 30),
-            ("تموز", 29),
-            ("آب", 30),
-            ("أيلول (الاعتدال الخريفي)", 29),
-            ("تشرين الأول", 30),
-            ("تشرين الثاني", 29)
-        ]
+    function calculateFowaqa(dayOfYear) {
+        const baseDelta = 10 * Math.sin((23.5 * Math.PI) / 180);
+        const angle = (2 * Math.PI * dayOfYear) / 365.2425;
+        const fDay = 60.0 - baseDelta * Math.cos(angle);
+        const fNight = 60.0 + baseDelta * Math.cos(angle);
+        return { fDay: fDay.toFixed(3), fNight: fNight.toFixed(3) };
+    }
+
+    function renderCalendar() {
+        const container = document.getElementById('calendar-container');
+        let html = '';
+        let dayCounter = 0;
         
-        # نقطة البداية المرجعية للكتاب: 10 كانون الأول من العام الحالي/السابق
-        anchor_dec_10 = datetime(self.current_real_date.year if self.current_real_date.month >= 12 else self.current_real_date.year - 1, 12, 10)
-        
-        calendar_db = []
-        global_day_counter = 0
-        
-        for m_idx, (m_name, m_days) in enumerate(months_structure):
-            month_days_list = []
-            for d_in_m in range(1, m_days + 1):
-                # التاريخ الميلادي المقابل لكل يوم معيني
-                current_gregorian_date = anchor_dec_10 + timedelta(days=global_day_counter)
-                
-                # حساب الفواقات واللمحات لهذا اليوم المعيني بالتحديد
-                f_day, f_night = self.calculate_fowaqa(global_day_counter)
-                l_day = f_day / 60.0  # اللمحة النهارية
-                l_night = f_night / 60.0  # اللمحة الليلية
-                
-                # التحقق من إثبات كتلة اليوم (86,400 ثانية ستينية = 24 ساعة معينية)
-                total_seconds = (12 * 60 * f_day) + (12 * 60 * f_night)
-                
-                # هل هو اليوم الحي الذي يعيشه المستخدم الآن؟
-                is_today = (current_gregorian_date.date() == self.current_real_date.date())
-                
-                day_info = {
-                    "day_index_in_year": global_day_counter,
-                    "gregorian_date": current_gregorian_date.strftime("%Y-%m-%d"),
-                    "day_name_in_month": f"اليوم {d_in_m} من {m_name}",
-                    "f_day": round(f_day, 3),
-                    "f_night": round(f_night, 3),
-                    "l_day": round(l_day, 3),
-                    "total_mass_seconds": round(total_seconds, 1),
-                    "is_live_today": is_today
-                }
-                month_days_list.append(day_info)
-                global_day_counter += 1
-                
-            calendar_db.append({
-                "month_name": m_name,
-                "days_count": m_days,
-                "days": month_days_list
-            })
+        // تاريخ اليوم الحقيقي للمقارنة (محاكاة أو تاريخ نظام الجهاز)
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        lunarMonths.forEach((month, mIndex) => {
+            html += `<div class="month-box">`;
+            html += `<div class="month-title">${mIndex + 1}. شهر ${month.name} (${month.days} يوماً)</div>`;
+            html += `<table>`;
+            html += `<tr><th>اليوم المعيني</th><th>الفواقة النهارية (F_day)</th><th>الفواقة الليلية (F_night)</th><th>الحالة</th></tr>`;
             
-        return calendar_db, anchor_dec_10
+            for (let d = 1; d <= month.days; d++) {
+                const fData = calculateFowaqa(dayCounter);
+                // محاكاة تطابق تاريخ للتوضيح
+                const isToday = (dayCounter === 10); // مثال تجريبي لمؤشر اليوم
+                const rowClass = isToday ? 'today-row' : '';
+                const badge = isToday ? '<span class="badge">أنت هنا اليوم</span>' : '';
 
-    def display_live_dashboard(self):
-        """عرض لوحة التحكم الحية للتقويم والوقت المطاطي المعيني"""
-        cal, start_anchor = self.generate_meeeni_calendar()
-        
-        print("==================================================================")
-        print("          محرك تقويم الزمن المطاطي المعيني (Me'eeni Engine)        ")
-        print(f"       نقطة الارتكاز الكونية: 10 كانون الأول ({start_anchor.strftime('%Y')})       ")
-        print("==================================================================")
-        
-        live_found = False
-        
-        for month in cal:
-            print(f"\n[ الشهر المعيني: {month['month_name']} ] (عدد الأيام: {month['days_count']})")
-            print("-" * 65)
-            print(f"{'التاريخ الميلادي':<12} | {'اليوم المعيني':<22} | {'F_day (نهار)':<12} | {'F_night (ليل)':<12}")
-            print("-" * 65)
-            
-            for day in month['days']:
-                marker = " ==> [أنت هنا اليوم]" if day['is_live_today'] else ""
-                if day['is_live_today']:
-                    live_found = True
-                    
-                print(f"{day['gregorian_date']:<12} | {day['day_name_in_month']:<22} | {day['f_day']:<12} | {day['f_night']:<12}{marker}")
-        
-        if not live_found:
-            print("\n[ملاحظة]: التاريخ الفعلي اليوم يقع خارج نطاق هذه السنة المعينية الحالية المعروضة، يتم ضبط المؤشر تلقائياً.")
+                html += `<tr class="${rowClass}">`;
+                html += `<td>اليوم ${d} من ${month.name}</td>`;
+                html += `<td>${fData.fDay} لمحة</td>`;
+                html += `<td>${fData.fNight} لمحة</td>`;
+                html += `<td>${badge}</td>`;
+                html += `</tr>`;
+                
+                dayCounter++;
+            }
+            html += `</table>`;
+            html += `</div>`;
+        });
 
-# --- التشغيل الفعلي للمحرك وتقويم السنة ---
-if __name__ == "__main__":
-    # تشغيل النظام بناءً على الوقت الحقيقي الحالي
-    engine = MeeeniCalendarEngine(latitude_deg=33.0)
-    engine.display_live_dashboard()
+        container.innerHTML = html;
+    }
+
+    renderCalendar();
+</script>
+
+</body>
+</html>
